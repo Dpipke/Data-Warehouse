@@ -12,7 +12,10 @@ const {createUser,
         getUser, 
         deleteUser,
         updateUserInformation
-    } = require('./database-functions')
+    } = require('./database-UserFunctions')
+const {getAllLocations,
+        addNewLocation
+    } = require('./database-RegionsFunctions')
 
 app.use(bodyParser.json())
 app.use(helmet())
@@ -126,6 +129,17 @@ app.post('/login', limiter, async (req, res) =>{
 
 }});
 
+// regions 
+app.get('/regions' , async (req, res)=>{
+    const table = await getAllCities()
+    console.log(JSON.stringify(table))
+})
+
+app.post('/regions', async (req, res) =>{
+    const name = req.body.name
+    const model = req.body.model
+    addNewLocation(model, name); 
+} )
 
 app.listen(3010, () => console.log("server started"))
 

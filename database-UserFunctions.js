@@ -1,5 +1,5 @@
 const {Sequelize, DataTypes} = require("sequelize")
-const {User} = require('./database')
+const {User} = require('./database-models')
 
 
 async function createUser(userProvided){
@@ -28,7 +28,7 @@ async function activateUser(user){
 }
 
 async function getUser(loginRequest){
-    const userToCheck = User.findAll({
+    const userToCheck = await User.findAll({
     where: {
     email: loginRequest.user,
   }

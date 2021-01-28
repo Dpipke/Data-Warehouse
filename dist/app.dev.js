@@ -14,13 +14,17 @@ var bcrypt = require('bcrypt');
 
 var dotenv = require('dotenv').config();
 
-var _require = require('./database-functions'),
+var _require = require('./database-UserFunctions'),
     createUser = _require.createUser,
     checkUserInDB = _require.checkUserInDB,
     activateUser = _require.activateUser,
     getUser = _require.getUser,
     deleteUser = _require.deleteUser,
     updateUserInformation = _require.updateUserInformation;
+
+var _require2 = require('./database-RegionsFunctions'),
+    getAllLocations = _require2.getAllLocations,
+    addNewLocation = _require2.addNewLocation;
 
 app.use(bodyParser.json());
 app.use(helmet());
@@ -222,15 +226,53 @@ app.post('/login', limiter, function _callee6(req, res) {
       }
     }
   });
+}); // regions 
+
+app.get('/regions', function _callee7(req, res) {
+  var table;
+  return regeneratorRuntime.async(function _callee7$(_context7) {
+    while (1) {
+      switch (_context7.prev = _context7.next) {
+        case 0:
+          _context7.next = 2;
+          return regeneratorRuntime.awrap(getAllCities());
+
+        case 2:
+          table = _context7.sent;
+          console.log(JSON.stringify(table));
+
+        case 4:
+        case "end":
+          return _context7.stop();
+      }
+    }
+  });
+});
+app.post('/regions', function _callee8(req, res) {
+  var name, model;
+  return regeneratorRuntime.async(function _callee8$(_context8) {
+    while (1) {
+      switch (_context8.prev = _context8.next) {
+        case 0:
+          name = req.body.name;
+          model = req.body.model;
+          addNewLocation(model, name);
+
+        case 3:
+        case "end":
+          return _context8.stop();
+      }
+    }
+  });
 });
 app.listen(3010, function () {
   return console.log("server started");
 });
 
 function checkPassword(req, res, next) {
-  return regeneratorRuntime.async(function checkPassword$(_context7) {
+  return regeneratorRuntime.async(function checkPassword$(_context9) {
     while (1) {
-      switch (_context7.prev = _context7.next) {
+      switch (_context9.prev = _context9.next) {
         case 0:
           if (req.body.password === req.body.repeatPassword) {
             next();
@@ -240,7 +282,7 @@ function checkPassword(req, res, next) {
 
         case 1:
         case "end":
-          return _context7.stop();
+          return _context9.stop();
       }
     }
   });
