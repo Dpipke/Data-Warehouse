@@ -107,6 +107,43 @@ var City = db.define('City', {
 }, {
   timestamps: false
 });
+var Company = db.define('Company', {
+  id: {
+    field: "id",
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  name: {
+    field: "name",
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  address: {
+    field: "address",
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  email: {
+    field: "email",
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  telephone: {
+    field: "telephone",
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  cityId: {
+    field: "cityId",
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    foreignKey: true
+  }
+}, {
+  timestamps: false
+});
 Region.hasMany(Country, {
   foreignKey: 'region_id'
 });
@@ -115,9 +152,14 @@ Country.hasMany(City, {
   foreignKey: 'country_id'
 });
 City.belongsTo(Country);
+City.hasMany(Company, {
+  foreignKey: 'cityId'
+});
+Company.belongsTo(City);
 module.exports = {
   User: User,
   Region: Region,
   Country: Country,
-  City: City
+  City: City,
+  Company: Company
 };

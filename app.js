@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const bodyParser = require("body-parser");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 const dotenv = require('dotenv').config();
 
 const {createUser, 
@@ -13,13 +14,16 @@ const {createUser,
         deleteUser,
         updateUserInformation
     } = require('./database-UserFunctions')
-const {getAllLocations,
-        addNewLocation
-    } = require('./database-RegionsFunctions')
+const {getAllRegisters,
+        addNewLocation,
+        updateRegister,
+        deleteRegister
+    } = require('./database-RegionsAndCompaniesFunctions')
 
 app.use(bodyParser.json())
 app.use(helmet())
-app.use(verifyToken);
+// app.use(verifyToken);
+app.use(cors())
 
 const authorizationPassword = process.env.AuthPassword;
 
@@ -42,8 +46,11 @@ const limiter = rateLimit({
 })
 
 // users 
-
 // admin creates users
+app.get('/users', async (req, res)=>{
+    const allUsers = await getAllRegisters('User')
+    res.status(200).json(allUsers)
+})
 app.post('/users', filterAdmin, async (req, res)=>{
     const user = {
         name: req.body.name,
@@ -131,16 +138,57 @@ app.post('/login', limiter, async (req, res) =>{
 
 // regions 
 app.get('/regions' , async (req, res)=>{
-    const table = await getAllCities()
-    console.log(JSON.stringify(table))
+    const allLocations = await getAllRegisters('Region')
+    console.log(allLocations)
+    res.status(200).json(allLocations)
 })
 
 app.post('/regions', async (req, res) =>{
     const name = req.body.name
+    const id = req.body.id
     const model = req.body.model
-    addNewLocation(model, name); 
+    addNewLocation(model, name, id); 
 } )
 
+app.delete('/regions', async (req, res)=>{
+    const locationId = req.body.id
+    const model = req.body.model
+    deleteRegister(model, locationId)
+})
+
+// companies
+app.get('/companies', async (req, res)=>{
+    const allCompanies = await getAllRegisters('Company')
+    console.log(allCompanies)
+    res.status(200).json(allCompanies)
+})
+
+app.post('/companies', async (req, res)=>{
+    const newCompany = {
+        name: req.body.name,
+        cityId: req.body.cityId,
+        address: req.body.address,
+        email: req.body.email,
+        telephone: req.body.telephone
+    }
+    addNewLocation('Company', newCompany)
+})
+app.put('/companies', async (req, res)=>{
+    const companyToUpdate ={
+        id: req.body.id,
+        name: req.body.name,
+        cityId: req.body.cityId,
+        address: req.body.address,
+        email: req.body.email,
+        telephone: req.body.telephone
+    }
+    const updatedCompany =  await updateRegister('Çompany', companyToUpdate)
+    res.status(200).send("updated")
+})
+app.delete('/companies', async (req, res)=>{
+    const companyId = req.body.id
+    deleteRegister('Company', companyId)
+})
 app.listen(3010, () => console.log("server started"))
 
 async function checkPassword(req, res, next){

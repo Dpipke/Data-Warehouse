@@ -10,7 +10,7 @@ var _require2 = require('./database-models'),
     City = _require2.City;
 
 function getAllLocations() {
-  var regionsTable;
+  var regionsTable, allLocations;
   return regeneratorRuntime.async(function getAllLocations$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -28,9 +28,10 @@ function getAllLocations() {
 
         case 2:
           regionsTable = _context.sent;
-          console.log(JSON.stringify(regionsTable));
+          allLocations = JSON.stringify(regionsTable);
+          return _context.abrupt("return", allLocations);
 
-        case 4:
+        case 5:
         case "end":
           return _context.stop();
       }
@@ -38,7 +39,7 @@ function getAllLocations() {
   });
 }
 
-function addNewLocation(model, name) {
+function addNewLocation(model, name, id) {
   var newRegion, newCountry, newCity;
   return regeneratorRuntime.async(function addNewLocation$(_context2) {
     while (1) {
@@ -62,18 +63,20 @@ function addNewLocation(model, name) {
         case 8:
           _context2.next = 10;
           return regeneratorRuntime.awrap(Country.create({
-            name: name
+            name: name,
+            RegionId: id
           }));
 
         case 10:
           newCountry = _context2.sent;
-          console.log(newCity);
+          console.log(newCountry);
           return _context2.abrupt("break", 18);
 
         case 13:
           _context2.next = 15;
           return regeneratorRuntime.awrap(City.create({
-            name: name
+            name: name,
+            CountryId: id
           }));
 
         case 15:

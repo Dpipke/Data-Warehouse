@@ -2,15 +2,25 @@
 body{
     margin: 0;
     padding: 0;
+    height: 100vh;
 }
 
 header{
-    background: rgba(0,0,0,0.25);
+    background: #1D72C2;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    width: 100vw;
 }
 
 nav{
     display: flex;
+}
+
+.dnone{
+    display: none;
+}
+
+.open-section{
+    width: 100vw;
 }
