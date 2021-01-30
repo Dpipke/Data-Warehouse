@@ -51,7 +51,7 @@ app.get('/users', async (req, res)=>{
     const allUsers = await getAllRegisters('User')
     res.status(200).json(allUsers)
 })
-app.post('/users', filterAdmin, async (req, res)=>{
+app.post('/users',  async (req, res)=>{
     const user = {
         name: req.body.name,
         lastname: req.body.lastname,
@@ -74,11 +74,10 @@ app.put('/users/:id', async (req, res) =>{
     const userUpdated = await updateUserInformation(user)
     console.log(userUpdated)
 })
-app.delete('/users', filterAdmin, async (req, res) => {
-    const user = {
-        id: req.body.id
-    }
-    const userDeleted = await deleteUser(user)
+app.delete('/users', async (req, res) => {
+    const id = req.body.id  
+    console.log(req.body)
+    // const userDeleted = await deleteUser(id)
     res.status(200).send("User successfully deleted")
     // FALTA 404 USER NOT FOUND
 })

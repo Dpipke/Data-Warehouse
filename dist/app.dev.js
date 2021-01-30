@@ -75,7 +75,7 @@ app.get('/users', function _callee(req, res) {
     }
   });
 });
-app.post('/users', filterAdmin, function _callee2(req, res) {
+app.post('/users', function _callee2(req, res) {
   var user, userCreated;
   return regeneratorRuntime.async(function _callee2$(_context2) {
     while (1) {
@@ -128,23 +128,18 @@ app.put('/users/:id', function _callee3(req, res) {
     }
   });
 });
-app["delete"]('/users', filterAdmin, function _callee4(req, res) {
-  var user, userDeleted;
+app["delete"]('/users', function _callee4(req, res) {
+  var id;
   return regeneratorRuntime.async(function _callee4$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
-          user = {
-            id: req.body.id
-          };
-          _context4.next = 3;
-          return regeneratorRuntime.awrap(deleteUser(user));
+          id = req.body.id;
+          console.log(req.body); // const userDeleted = await deleteUser(id)
 
-        case 3:
-          userDeleted = _context4.sent;
           res.status(200).send("User successfully deleted"); // FALTA 404 USER NOT FOUND
 
-        case 5:
+        case 3:
         case "end":
           return _context4.stop();
       }

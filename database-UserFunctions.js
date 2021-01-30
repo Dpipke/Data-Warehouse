@@ -36,10 +36,10 @@ async function getUser(loginRequest){
     return userToCheck
 }
 
-async function deleteUser(user){
+async function deleteUser(id){
     await User.destroy({
   where: {
-    id: user.id
+    id: id
   }
 })}
 async function updateUserInformation(user){
