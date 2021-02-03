@@ -9,40 +9,41 @@ var _require2 = require('./database-models'),
     Country = _require2.Country,
     City = _require2.City,
     Company = _require2.Company,
-    User = _require2.User;
+    User = _require2.User,
+    Contact = _require2.Contact,
+    ChannelSocialMedia = _require2.ChannelSocialMedia,
+    Preferency = _require2.Preferency;
 
 function getAllRegisters(model) {
-  var locationsTable, companiesTable, usersTable;
+  var regionsData, countriesData, citiesData, companiesTable, usersTable, contactsTable;
   return regeneratorRuntime.async(function getAllRegisters$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
           _context.t0 = model;
-          _context.next = _context.t0 === 'Region' ? 3 : _context.t0 === 'Company' ? 8 : _context.t0 === 'User' ? 14 : 19;
+          _context.next = _context.t0 === 'Region' ? 3 : _context.t0 === 'Company' ? 14 : _context.t0 === 'User' ? 20 : _context.t0 === 'Contact' ? 25 : 29;
           break;
 
         case 3:
           _context.next = 5;
-          return regeneratorRuntime.awrap(Region.findAll({
-            attributes: ['name'],
-            foreignKey: 'RegionId',
-            include: {
-              model: Country,
-              // nested: true,
-              required: true,
-              include: {
-                model: City,
-                required: true
-              }
-            }
-          }));
+          return regeneratorRuntime.awrap(Region.findAll({}));
 
         case 5:
-          locationsTable = _context.sent;
-          return _context.abrupt("return", locationsTable);
+          regionsData = _context.sent;
+          _context.next = 8;
+          return regeneratorRuntime.awrap(Country.findAll({}));
 
         case 8:
-          _context.next = 10;
+          countriesData = _context.sent;
+          _context.next = 11;
+          return regeneratorRuntime.awrap(City.findAll({}));
+
+        case 11:
+          citiesData = _context.sent;
+          return _context.abrupt("return", [regionsData, countriesData, citiesData]);
+
+        case 14:
+          _context.next = 16;
           return regeneratorRuntime.awrap(Company.findAll({
             attributes: ['id', 'name', 'address', 'email', 'telephone', 'cityId'],
             foreignKey: 'city',
@@ -53,21 +54,39 @@ function getAllRegisters(model) {
             }
           }));
 
-        case 10:
+        case 16:
           companiesTable = _context.sent;
           // const allCompanies = JSON.stringify(companiesTable)
           console.log(companiesTable);
           return _context.abrupt("return", companiesTable);
 
-        case 14:
-          _context.next = 16;
+        case 20:
+          _context.next = 22;
           return regeneratorRuntime.awrap(User.findAll());
 
-        case 16:
+        case 22:
           usersTable = _context.sent;
           return _context.abrupt("return", usersTable);
 
-        case 19:
+        case 25:
+          _context.next = 27;
+          return regeneratorRuntime.awrap(Contact.findAll({
+            attributes: ['name'],
+            foreignKey: 'RegionId',
+            include: {
+              // model: Country,
+              all: true,
+              nested: true,
+              required: true // include:{model: City, required: true}
+
+            }
+          }));
+
+        case 27:
+          contactsTable = _context.sent;
+          return _context.abrupt("return", locationsTable);
+
+        case 29:
         case "end":
           return _context.stop();
       }
@@ -76,7 +95,7 @@ function getAllRegisters(model) {
 }
 
 function updateRegister(model, register) {
-  var set, companyUpdated;
+  var set, setProperties, obj, companyUpdated;
   return regeneratorRuntime.async(function updateRegister$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
@@ -86,10 +105,16 @@ function updateRegister(model, register) {
           }).map(function (key) {
             return "".concat(key, " : ").concat(JSON.stringify(register[key]));
           }).join(",");
-          console.log(set); // switch(model, set, register) {
+          console.log(set);
+          setProperties = set.split(',');
+          obj = {};
+          setProperties.forEach(function (setProperties) {
+            var setValues = setProperties.split(':');
+            obj[setValues[0]] = setValues[1];
+          }); // switch(model, set, register) {
           //     case 'Company': 
 
-          _context2.next = 4;
+          _context2.next = 7;
           return regeneratorRuntime.awrap(Company.update({
             set: set
           }, {
@@ -98,12 +123,12 @@ function updateRegister(model, register) {
             }
           }));
 
-        case 4:
+        case 7:
           companyUpdated = _context2.sent;
           console.log(companyUpdated);
           return _context2.abrupt("return", companyUpdated);
 
-        case 7:
+        case 10:
         case "end":
           return _context2.stop();
       }
@@ -112,13 +137,13 @@ function updateRegister(model, register) {
 }
 
 function deleteRegister(model, id) {
-  var companyToDelete, regionToDelete, countryToDelete, cityToDelete;
+  var companyToDelete, citiesdependentOnCountryToDelete, countryToDelete, cityToDelete, userToDelete;
   return regeneratorRuntime.async(function deleteRegister$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
           _context3.t0 = model;
-          _context3.next = _context3.t0 === 'Company' ? 3 : _context3.t0 === 'Region' ? 7 : _context3.t0 === 'Country' ? 11 : _context3.t0 === 'City' ? 15 : 19;
+          _context3.next = _context3.t0 === 'Company' ? 3 : _context3.t0 === 'Region' ? 7 : _context3.t0 === 'Country' ? 8 : _context3.t0 === 'City' ? 15 : _context3.t0 === 'User' ? 19 : 23;
           break;
 
         case 3:
@@ -131,21 +156,21 @@ function deleteRegister(model, id) {
 
         case 5:
           companyToDelete = _context3.sent;
-          return _context3.abrupt("break", 19);
+          return _context3.abrupt("break", 23);
 
         case 7:
-          _context3.next = 9;
-          return regeneratorRuntime.awrap(Region.destroy({
+          return _context3.abrupt("break", 23);
+
+        case 8:
+          _context3.next = 10;
+          return regeneratorRuntime.awrap(City.destroy({
             where: {
-              id: id
+              CountryId: id
             }
           }));
 
-        case 9:
-          regionToDelete = _context3.sent;
-          return _context3.abrupt("break", 19);
-
-        case 11:
+        case 10:
+          citiesdependentOnCountryToDelete = _context3.sent;
           _context3.next = 13;
           return regeneratorRuntime.awrap(Country.destroy({
             where: {
@@ -155,7 +180,7 @@ function deleteRegister(model, id) {
 
         case 13:
           countryToDelete = _context3.sent;
-          return _context3.abrupt("break", 19);
+          return _context3.abrupt("break", 23);
 
         case 15:
           _context3.next = 17;
@@ -167,9 +192,21 @@ function deleteRegister(model, id) {
 
         case 17:
           cityToDelete = _context3.sent;
-          return _context3.abrupt("break", 19);
+          return _context3.abrupt("break", 23);
 
         case 19:
+          _context3.next = 21;
+          return regeneratorRuntime.awrap(User.destroy({
+            where: {
+              id: id
+            }
+          }));
+
+        case 21:
+          userToDelete = _context3.sent;
+          return _context3.abrupt("break", 23);
+
+        case 23:
         case "end":
           return _context3.stop();
       }

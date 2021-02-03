@@ -11,14 +11,14 @@ const {createUser,
         checkUserInDB, 
         activateUser, 
         getUser, 
-        deleteUser,
         updateUserInformation
     } = require('./database-UserFunctions')
 const {getAllRegisters,
         addNewLocation,
         updateRegister,
         deleteRegister
-    } = require('./database-RegionsAndCompaniesFunctions')
+    } = require('./database-RegionsAndCompaniesFunctions');
+
 
 app.use(bodyParser.json())
 app.use(helmet())
@@ -74,10 +74,10 @@ app.put('/users/:id', async (req, res) =>{
     const userUpdated = await updateUserInformation(user)
     console.log(userUpdated)
 })
-app.delete('/users', async (req, res) => {
-    const id = req.body.id  
-    console.log(req.body)
-    // const userDeleted = await deleteUser(id)
+app.delete('/users/:id', async (req, res) => {
+    const id = req.params.id  
+    console.log(id)
+    const userDeleted = await deleteRegister('User',id)
     res.status(200).send("User successfully deleted")
     // FALTA 404 USER NOT FOUND
 })
@@ -138,28 +138,72 @@ app.post('/login', limiter, async (req, res) =>{
 // regions 
 app.get('/regions' , async (req, res)=>{
     const allLocations = await getAllRegisters('Region')
-    console.log(allLocations)
-    res.status(200).json(allLocations)
+    const allRegions = allLocations[0]
+    const allCountries = allLocations[1]
+    const allCities = allLocations[2]
+    const locationsArray = []
+    const mappedLocations = allRegions.map(region =>{
+            const eachLocation = Object.assign({"regionId": region.id, "regionName": region.name, "countries":[]})
+            allCountries.map( country =>{
+                if(region.id === country.RegionId){
+                    const eachCountry = {"countryId": country.id, "countryName": country.name, "cities":[]}
+                    eachLocation.countries.push(eachCountry)
+                    allCities.map(city =>{
+                        if(country.id === city.CountryId){
+                            const eachCity = {"cityId": city.id, "cityName": city.name}
+                            eachCountry.cities.push(eachCity)
+                        }
+                    })
+                }
+            } )
+            locationsArray.push(eachLocation)
+    })
+    res.status(200).json(locationsArray)
 })
 
 app.post('/regions', async (req, res) =>{
     const name = req.body.name
     const id = req.body.id
-    const model = req.body.model
-    addNewLocation(model, name, id); 
+    console.log(name, id)
+    addNewLocation('Region',name, id); 
 } )
 
-app.delete('/regions', async (req, res)=>{
-    const locationId = req.body.id
-    const model = req.body.model
-    deleteRegister(model, locationId)
+app.post('/countries', async (req, res) =>{
+    const name = req.body.name
+    const regionId = req.body.id
+    console.log(name, regionId)
+    addNewLocation('Country',name, regionId); 
+} )
+
+app.post('/cities', async (req, res) =>{
+    const name = req.body.name
+    const countryId = req.body.id
+    console.log(name, countryId)
+    addNewLocation('City',name, countryId); 
+} )
+
+app.delete('/regions/:id', async (req, res)=>{
+    const locationId = req.params.id
+    deleteRegister('Region', locationId)
 })
+
+app.delete('/countries/:id', async (req, res)=>{
+    const locationId = req.params.id
+    deleteRegister('Country', locationId)
+})
+app.delete('/cities/:id', async (req, res)=>{
+    const locationId = req.params.id
+    deleteRegister('City', locationId)
+})
+
+
 
 // companies
 app.get('/companies', async (req, res)=>{
     const allCompanies = await getAllRegisters('Company')
-    console.log(allCompanies)
-    res.status(200).json(allCompanies)
+    const mappedCompanies = allCompanies.map(item=> Object.assign({id: item.id, name: item.name, address: item.address, email: item.email, telephone: item.telephone, city: item.City.name, country: item.City.Country.name, region: item.City.Country.Region.name }) )
+    res.status(200).json(mappedCompanies)
+
 })
 
 app.post('/companies', async (req, res)=>{
@@ -184,10 +228,16 @@ app.put('/companies', async (req, res)=>{
     const updatedCompany =  await updateRegister('Çompany', companyToUpdate)
     res.status(200).send("updated")
 })
-app.delete('/companies', async (req, res)=>{
-    const companyId = req.body.id
+app.delete('/companies/:id', async (req, res)=>{
+    const companyId = req.params.id
     deleteRegister('Company', companyId)
 })
+
+app.get('/contacts', async(req, res)=>{
+    const allContacts = await getAllRegisters('Contact')
+    res.status(200).json(allContacts)
+})
+
 app.listen(3010, () => console.log("server started"))
 
 async function checkPassword(req, res, next){

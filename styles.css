@@ -12,10 +12,28 @@ header{
     flex-direction: row;
     justify-content: space-between;
     width: 100vw;
+    height: 10vh;
 }
 
 nav{
+    width: 50vw;
+}
+.ul-nav{
     display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.ul-nav li{
+    margin-top: 1vh;
+    list-style: none;
+    color: white;
+    padding-bottom: 3.2vh;
+}
+.ul-nav li:hover{
+    border-bottom: 2px solid white;
+}
+main{
+    position: relative;
 }
 
 .dnone{
@@ -27,21 +45,103 @@ nav{
 .open-section{
     width: 100vw;
     margin: 5%;
+    padding-top: 3%;
 }
-.add-locations-buttons{
+.locations-buttons{
     margin-bottom: 10%;
     padding: 1%;
-    position: absolute;
-    left: 95%;
     background: #1D72C2;
     border-radius: 2px;
     border-radius: 2px;
+    text-align: center;
+}
+.addRegion{
+    transform: translateY(-120%);
+}
+.addCountry{
+    transform: translateY(-20%);
+}
+.addCity{
+    transform: translateY(-40%);
+}
+.addLocation{
+    position: absolute;
+    left: 85%;
+}
+.editLocation{
+    position: absolute;
+    margin-left: 10%;
+    transform: translateY(-28%);
+}
+.deleteLocation{
+    margin-left: 17%;
+}
+.eachRegion{
+    margin-bottom: 3%;
+}
+.eachCountry{
+    margin: 1%;
+    margin-left: 2%;
+    transform: translateY(-180%);
+}
+.eachCity{
+    max-width: 50%;
+    margin: 2%;
+    margin-left: 7%;
+    margin-right: 5%;
+    transform: translateY(-230%);
+}
+.editCity{
+    margin-left: 17%;
+}
+.deleteCity{
+    margin-left: 25%;
+}
+.fixed-window{
+    position: fixed;
+    top: 7%;
+    width: 90vw;
+    height: 60vh;
+    background: rgba(255,255,255,1);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid rgba(0,0,0,0.10);
+
+}
+.fixed-window-buttons{
+    width: 80vw;
+    height: 20vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
 }
 
-.add-register{
-    position: fixed;
+table{
+    border: 1px solid rgba(0,0,0,0.10);
     width: 90vw;
-    height: 90vh;
-    background: rgba(255,255,255,1);
+    margin-top: 10vh;
+}
+th{
+    border-bottom: 1px solid rgba(0,0,0,0.10);
+    padding: 2%;
+}
+td{
+    padding: 2%;
+}
+.addRegister{
+    position: absolute;
+    left: 85%;
+}
 
+.header-section{
+    background: #1D72C2;
+    height: 10vh;
+    width: 100%;
+   align-self: flex-start;
+}
+form{
+    margin-bottom: 12%;
 }

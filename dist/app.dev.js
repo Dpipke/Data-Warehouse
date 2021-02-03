@@ -21,7 +21,6 @@ var _require = require('./database-UserFunctions'),
     checkUserInDB = _require.checkUserInDB,
     activateUser = _require.activateUser,
     getUser = _require.getUser,
-    deleteUser = _require.deleteUser,
     updateUserInformation = _require.updateUserInformation;
 
 var _require2 = require('./database-RegionsAndCompaniesFunctions'),
@@ -128,18 +127,22 @@ app.put('/users/:id', function _callee3(req, res) {
     }
   });
 });
-app["delete"]('/users', function _callee4(req, res) {
-  var id;
+app["delete"]('/users/:id', function _callee4(req, res) {
+  var id, userDeleted;
   return regeneratorRuntime.async(function _callee4$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
-          id = req.body.id;
-          console.log(req.body); // const userDeleted = await deleteUser(id)
+          id = req.params.id;
+          console.log(id);
+          _context4.next = 4;
+          return regeneratorRuntime.awrap(deleteRegister('User', id));
 
+        case 4:
+          userDeleted = _context4.sent;
           res.status(200).send("User successfully deleted"); // FALTA 404 USER NOT FOUND
 
-        case 3:
+        case 6:
         case "end":
           return _context4.stop();
       }
@@ -249,7 +252,7 @@ app.post('/login', limiter, function _callee7(req, res) {
 }); // regions 
 
 app.get('/regions', function _callee8(req, res) {
-  var allLocations;
+  var allLocations, allRegions, allCountries, allCities, locationsArray, mappedLocations;
   return regeneratorRuntime.async(function _callee8$(_context8) {
     while (1) {
       switch (_context8.prev = _context8.next) {
@@ -259,10 +262,40 @@ app.get('/regions', function _callee8(req, res) {
 
         case 2:
           allLocations = _context8.sent;
-          console.log(allLocations);
-          res.status(200).json(allLocations);
+          allRegions = allLocations[0];
+          allCountries = allLocations[1];
+          allCities = allLocations[2];
+          locationsArray = [];
+          mappedLocations = allRegions.map(function (region) {
+            var eachLocation = Object.assign({
+              "regionId": region.id,
+              "regionName": region.name,
+              "countries": []
+            });
+            allCountries.map(function (country) {
+              if (region.id === country.RegionId) {
+                var eachCountry = {
+                  "countryId": country.id,
+                  "countryName": country.name,
+                  "cities": []
+                };
+                eachLocation.countries.push(eachCountry);
+                allCities.map(function (city) {
+                  if (country.id === city.CountryId) {
+                    var eachCity = {
+                      "cityId": city.id,
+                      "cityName": city.name
+                    };
+                    eachCountry.cities.push(eachCity);
+                  }
+                });
+              }
+            });
+            locationsArray.push(eachLocation);
+          });
+          res.status(200).json(locationsArray);
 
-        case 5:
+        case 9:
         case "end":
           return _context8.stop();
       }
@@ -270,15 +303,15 @@ app.get('/regions', function _callee8(req, res) {
   });
 });
 app.post('/regions', function _callee9(req, res) {
-  var name, id, model;
+  var name, id;
   return regeneratorRuntime.async(function _callee9$(_context9) {
     while (1) {
       switch (_context9.prev = _context9.next) {
         case 0:
           name = req.body.name;
           id = req.body.id;
-          model = req.body.model;
-          addNewLocation(model, name, id);
+          console.log(name, id);
+          addNewLocation('Region', name, id);
 
         case 4:
         case "end":
@@ -287,50 +320,128 @@ app.post('/regions', function _callee9(req, res) {
     }
   });
 });
-app["delete"]('/regions', function _callee10(req, res) {
-  var locationId, model;
+app.post('/countries', function _callee10(req, res) {
+  var name, regionId;
   return regeneratorRuntime.async(function _callee10$(_context10) {
     while (1) {
       switch (_context10.prev = _context10.next) {
         case 0:
-          locationId = req.body.id;
-          model = req.body.model;
-          deleteRegister(model, locationId);
+          name = req.body.name;
+          regionId = req.body.id;
+          console.log(name, regionId);
+          addNewLocation('Country', name, regionId);
 
-        case 3:
+        case 4:
         case "end":
           return _context10.stop();
       }
     }
   });
-}); // companies
-
-app.get('/companies', function _callee11(req, res) {
-  var allCompanies;
+});
+app.post('/cities', function _callee11(req, res) {
+  var name, countryId;
   return regeneratorRuntime.async(function _callee11$(_context11) {
     while (1) {
       switch (_context11.prev = _context11.next) {
         case 0:
-          _context11.next = 2;
-          return regeneratorRuntime.awrap(getAllRegisters('Company'));
+          name = req.body.name;
+          countryId = req.body.id;
+          console.log(name, countryId);
+          addNewLocation('City', name, countryId);
 
-        case 2:
-          allCompanies = _context11.sent;
-          console.log(allCompanies);
-          res.status(200).json(allCompanies);
-
-        case 5:
+        case 4:
         case "end":
           return _context11.stop();
       }
     }
   });
 });
-app.post('/companies', function _callee12(req, res) {
-  var newCompany;
+app["delete"]('/regions/:id', function _callee12(req, res) {
+  var locationId;
   return regeneratorRuntime.async(function _callee12$(_context12) {
     while (1) {
       switch (_context12.prev = _context12.next) {
+        case 0:
+          locationId = req.params.id;
+          deleteRegister('Region', locationId);
+
+        case 2:
+        case "end":
+          return _context12.stop();
+      }
+    }
+  });
+});
+app["delete"]('/countries/:id', function _callee13(req, res) {
+  var locationId;
+  return regeneratorRuntime.async(function _callee13$(_context13) {
+    while (1) {
+      switch (_context13.prev = _context13.next) {
+        case 0:
+          locationId = req.params.id;
+          deleteRegister('Country', locationId);
+
+        case 2:
+        case "end":
+          return _context13.stop();
+      }
+    }
+  });
+});
+app["delete"]('/cities/:id', function _callee14(req, res) {
+  var locationId;
+  return regeneratorRuntime.async(function _callee14$(_context14) {
+    while (1) {
+      switch (_context14.prev = _context14.next) {
+        case 0:
+          locationId = req.params.id;
+          deleteRegister('City', locationId);
+
+        case 2:
+        case "end":
+          return _context14.stop();
+      }
+    }
+  });
+}); // companies
+
+app.get('/companies', function _callee15(req, res) {
+  var allCompanies, mappedCompanies;
+  return regeneratorRuntime.async(function _callee15$(_context15) {
+    while (1) {
+      switch (_context15.prev = _context15.next) {
+        case 0:
+          _context15.next = 2;
+          return regeneratorRuntime.awrap(getAllRegisters('Company'));
+
+        case 2:
+          allCompanies = _context15.sent;
+          mappedCompanies = allCompanies.map(function (item) {
+            return Object.assign({
+              id: item.id,
+              name: item.name,
+              address: item.address,
+              email: item.email,
+              telephone: item.telephone,
+              city: item.City.name,
+              country: item.City.Country.name,
+              region: item.City.Country.Region.name
+            });
+          });
+          res.status(200).json(mappedCompanies);
+
+        case 5:
+        case "end":
+          return _context15.stop();
+      }
+    }
+  });
+});
+app.post('/companies', function _callee16(req, res) {
+  var newCompany;
+  return regeneratorRuntime.async(function _callee16$(_context16) {
+    while (1) {
+      switch (_context16.prev = _context16.next) {
         case 0:
           newCompany = {
             name: req.body.name,
@@ -343,16 +454,16 @@ app.post('/companies', function _callee12(req, res) {
 
         case 2:
         case "end":
-          return _context12.stop();
+          return _context16.stop();
       }
     }
   });
 });
-app.put('/companies', function _callee13(req, res) {
+app.put('/companies', function _callee17(req, res) {
   var companyToUpdate, updatedCompany;
-  return regeneratorRuntime.async(function _callee13$(_context13) {
+  return regeneratorRuntime.async(function _callee17$(_context17) {
     while (1) {
-      switch (_context13.prev = _context13.next) {
+      switch (_context17.prev = _context17.next) {
         case 0:
           companyToUpdate = {
             id: req.body.id,
@@ -362,32 +473,52 @@ app.put('/companies', function _callee13(req, res) {
             email: req.body.email,
             telephone: req.body.telephone
           };
-          _context13.next = 3;
+          _context17.next = 3;
           return regeneratorRuntime.awrap(updateRegister('Çompany', companyToUpdate));
 
         case 3:
-          updatedCompany = _context13.sent;
+          updatedCompany = _context17.sent;
           res.status(200).send("updated");
 
         case 5:
         case "end":
-          return _context13.stop();
+          return _context17.stop();
       }
     }
   });
 });
-app["delete"]('/companies', function _callee14(req, res) {
+app["delete"]('/companies/:id', function _callee18(req, res) {
   var companyId;
-  return regeneratorRuntime.async(function _callee14$(_context14) {
+  return regeneratorRuntime.async(function _callee18$(_context18) {
     while (1) {
-      switch (_context14.prev = _context14.next) {
+      switch (_context18.prev = _context18.next) {
         case 0:
-          companyId = req.body.id;
+          companyId = req.params.id;
           deleteRegister('Company', companyId);
 
         case 2:
         case "end":
-          return _context14.stop();
+          return _context18.stop();
+      }
+    }
+  });
+});
+app.get('/contacts', function _callee19(req, res) {
+  var allContacts;
+  return regeneratorRuntime.async(function _callee19$(_context19) {
+    while (1) {
+      switch (_context19.prev = _context19.next) {
+        case 0:
+          _context19.next = 2;
+          return regeneratorRuntime.awrap(getAllRegisters('Contact'));
+
+        case 2:
+          allContacts = _context19.sent;
+          res.status(200).json(allContacts);
+
+        case 4:
+        case "end":
+          return _context19.stop();
       }
     }
   });
@@ -397,9 +528,9 @@ app.listen(3010, function () {
 });
 
 function checkPassword(req, res, next) {
-  return regeneratorRuntime.async(function checkPassword$(_context15) {
+  return regeneratorRuntime.async(function checkPassword$(_context20) {
     while (1) {
-      switch (_context15.prev = _context15.next) {
+      switch (_context20.prev = _context20.next) {
         case 0:
           if (req.body.password === req.body.repeatPassword) {
             next();
@@ -409,7 +540,7 @@ function checkPassword(req, res, next) {
 
         case 1:
         case "end":
-          return _context15.stop();
+          return _context20.stop();
       }
     }
   });

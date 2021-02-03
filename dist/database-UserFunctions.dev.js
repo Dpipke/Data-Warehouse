@@ -107,55 +107,41 @@ function getUser(loginRequest) {
   });
 }
 
-function deleteUser(id) {
-  return regeneratorRuntime.async(function deleteUser$(_context5) {
+function updateUserInformation(user) {
+  var set, setProperties, obj, userUpdated;
+  return regeneratorRuntime.async(function updateUserInformation$(_context5) {
     while (1) {
       switch (_context5.prev = _context5.next) {
-        case 0:
-          _context5.next = 2;
-          return regeneratorRuntime.awrap(User.destroy({
-            where: {
-              id: id
-            }
-          }));
-
-        case 2:
-        case "end":
-          return _context5.stop();
-      }
-    }
-  });
-}
-
-function updateUserInformation(user) {
-  var set, userUpdated;
-  return regeneratorRuntime.async(function updateUserInformation$(_context6) {
-    while (1) {
-      switch (_context6.prev = _context6.next) {
         case 0:
           set = Object.keys(user).filter(function (key) {
             return user[key] != null && key != "id";
           }).map(function (key) {
-            return "".concat(key, " : ").concat(JSON.stringify(user[key]));
+            return "".concat(key, " : ").concat(user[key]);
           }).join(",");
           console.log(set);
-          _context6.next = 4;
+          setProperties = set.split(',');
+          obj = {};
+          setProperties.forEach(function (setProperties) {
+            var setValues = setProperties.split(':');
+            obj[setValues[0]] = setValues[1];
+          });
+          _context5.next = 7;
           return regeneratorRuntime.awrap(User.update({
-            set: set
+            obj: obj
           }, {
             where: {
               id: +user.id
             }
           }));
 
-        case 4:
-          userUpdated = _context6.sent;
-          console.log(userUpdated);
-          return _context6.abrupt("return", userUpdated);
-
         case 7:
+          userUpdated = _context5.sent;
+          console.log(userUpdated);
+          return _context5.abrupt("return", userUpdated);
+
+        case 10:
         case "end":
-          return _context6.stop();
+          return _context5.stop();
       }
     }
   });
@@ -166,6 +152,5 @@ module.exports = {
   checkUserInDB: checkUserInDB,
   activateUser: activateUser,
   getUser: getUser,
-  deleteUser: deleteUser,
   updateUserInformation: updateUserInformation
 };

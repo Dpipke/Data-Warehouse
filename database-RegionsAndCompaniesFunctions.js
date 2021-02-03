@@ -1,21 +1,13 @@
 const {Sequelize, DataTypes} = require("sequelize")
-const {Region, Country, City, Company, User} = require('./database-models')
+const {Region, Country, City, Company, User, Contact, ChannelSocialMedia, Preferency} = require('./database-models')
 
 async function getAllRegisters(model){ 
     switch(model) {
         case 'Region': 
-            const locationsTable =  await Region.findAll({
-                attributes: ['name'],
-                foreignKey: 'RegionId',
-                include: {
-                    model: Country,
-                    // nested: true,
-                    required: true,
-                    include:{model: City, required: true}}},
-                );
-                // const allRegisters = JSON.stringify(locationsTable)
-                // console.log(allRegisters)
-                return locationsTable
+            const regionsData = await Region.findAll({});
+            const countriesData = await Country.findAll({});
+            const citiesData = await City.findAll({});
+            return [regionsData, countriesData, citiesData]
         break;
         case 'Company': 
             const companiesTable = await Company.findAll({
@@ -37,6 +29,21 @@ async function getAllRegisters(model){
             // console.log(allUsers)
             return usersTable
         break;
+        case 'Contact':
+            const contactsTable =  await Contact.findAll({
+                attributes: ['name'],
+                foreignKey: 'RegionId',
+                include: {
+                    // model: Country,
+                    all: true,
+                    nested: true,
+                    required: true,
+                    // include:{model: City, required: true}
+                }},
+                );
+                // const allRegisters = JSON.stringify(locationsTable)
+                // console.log(allRegisters)
+                return locationsTable
             }
 
       }
@@ -44,6 +51,12 @@ async function getAllRegisters(model){
 async function updateRegister(model, register){
     const set = Object.keys(register).filter(key => register[key] != null && key != "id").map(key => `${key} : ${JSON.stringify(register[key])}`).join(",")
     console.log(set)
+    const setProperties = set.split(',')
+    const obj = {}
+    setProperties.forEach(function(setProperties){
+        const setValues = setProperties.split(':')
+        obj [setValues[0]] = setValues[1]
+  })
     // switch(model, set, register) {
     //     case 'Company': 
                 const companyUpdated = 
@@ -69,18 +82,36 @@ async function deleteRegister(model, id){
             })
         break;
         case 'Region': 
-            const regionToDelete =  await Region.destroy({
-                where: {
-                id: id
-                }
-            })
+
+            // const countryIdDependentOnRegionToDelete =  await Country.findAll({
+            //     where: {
+            //     RegionId: id
+            //     }
+            // })
+            // console.log(countryIdDependentOnRegionToDelete)
+            // const countryDependentOnRegionToDelete =  await Country.destroy({
+            //     where: {
+            //     RegionId: id
+            //     }
+            // })
+            // const regionToDelete =  await Region.destroy({
+            //     where: {
+            //     id: id
+            //     }
+            // })
         break;
         case 'Country': 
+            const citiesdependentOnCountryToDelete =  await City.destroy({
+                where: {
+                CountryId: id
+                }
+            })
             const countryToDelete =  await Country.destroy({
                 where: {
                 id: id
                 }
             })
+
         break;
         case 'City': 
             const cityToDelete =  await City.destroy({
@@ -88,6 +119,13 @@ async function deleteRegister(model, id){
                 id: id
                 }
             })
+        break;
+        case 'User': 
+        const userToDelete =  await User.destroy({
+            where: {
+            id: id
+            }
+        })
         break;
     }
 }   

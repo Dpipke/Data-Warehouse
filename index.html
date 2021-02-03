@@ -11,26 +11,43 @@
     <header>
         <img src="" alt="LOGO">
         <nav>
-            <ul>
-                <li>Contactos</li>
-                <li><a id="users-li">Usuarios</a>
-                </li>
-                <li><a id="company-li">Compañía</a>   </li>
+            <ul class="ul-nav">
+                <li id="contacts-li">Contactos</li>
+                <li><a id="users-li">Usuarios</a></li>
+                <li><a id="company-li">Compañía</a></li>
                 <li><a id="region-li"> Región/Ciudad</a></li>
             </ul>
         </nav>
     </header>
     <main>
+        <section class="dnone" id="contacts-section">
+            <input type="text">
+            <img src="" alt="lens">
+        </section>
         <section class='dnone' id="region-section">
             <div class='dnone' id="add-location">
+                <div class="header-section"></div>
                 <form action="regions">
                     <p id="addLocation-title"></p>
-                    <input type="text">
-                    <input type="submit" name="" id="add-location-button">
+                    <input type="text" id="input-new-location">
+                    <p href="" class="locations-buttons" id="add-location-button">Añadir</p>
                 </form>
             </div> 
+            <div class="dnone" id="delete-location">
+                <div class="header-section"></div>
+                <p>¿Esta seguro que desea eliminar </p><p id="locationToDelete"></p>
+                <div class="fixed-window-buttons">
+                    <p href="" class="locations-buttons" id="yesButton">Sí</p>
+                    <p href="" class="locations-buttons" id="noButton">No</p>
+                </div>
+            </div>
+            <div class="dnone" id="update-location">
+                <div class="header-section"></div>
+                <p>Actualizar</p><p id="locationToUpdate"></p>
+            </div>
         </section>
         <section class="dnone" id="company-section">
+            <a href="" class="locations-buttons addRegister">Agregar Compañía</a>
             <table id='company-table'>
                 <th>Nombre</th>
                 <th>Direccion</th>
@@ -39,15 +56,18 @@
                 <th>Ciudad</th>
                 <th>País</th>
                 <th>Región</th>
+                <th>Acciones</th>
             </table>
         </section>
         <section class="dnone" id="users-section">
+            <a href="" class="locations-buttons addRegister">Agregar Usuario</a>
             <table id='users-table'>
                 <th>Nombre</th>
                 <th>Apellido</th>
                 <th>Email</th>
                 <th>Rol</th>
-                <th>Contrasenia</th>
+                <th>Contraseña</th>
+                <th>Acciones</th>
             </table>
         </section>
     </main>

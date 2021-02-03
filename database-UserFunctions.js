@@ -36,21 +36,22 @@ async function getUser(loginRequest){
     return userToCheck
 }
 
-async function deleteUser(id){
-    await User.destroy({
-  where: {
-    id: id
-  }
-})}
+
 async function updateUserInformation(user){
-  const set = Object.keys(user).filter(key => user[key] != null && key != "id").map(key => `${key} : ${JSON.stringify(user[key])}`).join(",")
+  const set = Object.keys(user).filter(key => user[key] != null && key != "id").map(key => `${key} : ${user[key]}`).join(",")
   console.log(set)
+  const setProperties = set.split(',')
+  const obj = {}
+  setProperties.forEach(function(setProperties){
+    const setValues = setProperties.split(':')
+    obj [setValues[0]] = setValues[1]
+  })
   const userUpdated = 
-  await User.update({set}, {
-    where: {
-      id: +user.id
-    }
-  });
+    await User.update({obj}, {
+      where: {
+        id: +user.id
+      }
+    });
   console.log(userUpdated)
   return userUpdated
 }
@@ -59,6 +60,5 @@ module.exports = {
     checkUserInDB,
     activateUser,
     getUser, 
-    deleteUser,
     updateUserInformation
 }
