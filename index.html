@@ -44,10 +44,16 @@
             <div class="dnone" id="update-location">
                 <div class="header-section"></div>
                 <p>Actualizar</p><p id="locationToUpdate"></p>
+                <p>Nombre</p>
+                <input type="text" id="inputlocationToUpdate">
+                <div class="fixed-window-buttons">
+                    <p href="" class="locations-buttons" id="update-location-button">Actualizar</p>
+                    <p href="" class="locations-buttons" id="cancel-update-section">Cancelar</p>
+                </div>
             </div>
         </section>
         <section class="dnone" id="company-section">
-            <a href="" class="locations-buttons addRegister">Agregar Compañía</a>
+            <p class="locations-buttons addRegister" id="addCompanyButton-openWindow">Agregar Compañía</p>
             <table id='company-table'>
                 <th>Nombre</th>
                 <th>Direccion</th>
@@ -58,9 +64,52 @@
                 <th>Región</th>
                 <th>Acciones</th>
             </table>
+            <div class="dnone" id="addCompanyWindow">
+                <div class="header-section headerCompany">
+                    <h2>Nueva Compañía</h2>
+                </div>
+                <form action="post" class="addRegisterForm">
+                    <fieldset class="registerFieldset">
+                        <label for="name">
+                            <p>Nombre</p>
+                            <input type="text" name="name">
+                        </label>
+                        <label for="address">
+                            <p>Dirección</p>
+                            <input type="text" name="address">
+                        </label>
+                        <label for="email">
+                            <p>Email</p>
+                            <input type="text" name="email">
+                        </label>
+                        <label for="telephone">
+                            <p>Teléfono</p>
+                            <input type="text" name="telephone">
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="city">
+                            <p>Ciudad</p>
+                            <input type="text" name="city">
+                        </label>
+                        <label for="country">
+                            <p>País</p>
+                            <input type="text" name="country">
+                        </label>
+                        <label for="region">
+                            <p>Región</p>
+                            <input type="text" name="region">
+                        </label>
+                    </fieldset>
+                </form>
+                <div class="buttons">
+                    <p class="locations-buttons cancelAddRegister" id="cancelAddCompany">Cancelar</p>
+                    <p class="locations-buttons addRegisterButton" id="addCompanyButton">Agregar Compañía</p>
+                </div>
+            </div>
         </section>
         <section class="dnone" id="users-section">
-            <a href="" class="locations-buttons addRegister">Agregar Usuario</a>
+            <p class="locations-buttons addRegister" id="addUserButton-openWindow">Agregar Usuario</p>
             <table id='users-table'>
                 <th>Nombre</th>
                 <th>Apellido</th>
@@ -69,8 +118,45 @@
                 <th>Contraseña</th>
                 <th>Acciones</th>
             </table>
+            <div class="dnone" id="addUserWindow">
+                <div class="header-section headerCompany">
+                    <h2>Nuevo Usuario</h2>
+                </div>
+                <form action="post" class="addRegisterForm">
+                    <fieldset class="registerFieldset">
+                        <label for="name">
+                            <p>Nombre</p>
+                            <input type="text" name="name" id="postUserName" required>
+                        </label>
+                        <label for="lastname">
+                            <p>Apellido</p>
+                            <input type="text" name="lastname" id="postUserLastname" required>
+                        </label>
+                        <label for="email">
+                            <p>Email</p>
+                            <input type="text" name="email" id="postUserEmail" required>
+                        </label>
+                        <label for="role">
+                            <p>Rol</p>
+                            <select name="role" required id="postUserRole">
+                                <option value="Basic" selected>Básico</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </label>
+                    </fieldset>
+                </form>
+                <div class="buttons">
+                    <p class="locations-buttons cancelAddRegister" id="cancelAddUser">Cancelar</p>
+                    <p class="locations-buttons addRegisterButton" id="addUserButton">Agregar Usuario</p>
+                </div>
+            </div>
+            <div class="dnone" id="closeAddUserWindow">
+                <div class="header-section"></div>
+                <h3>Usuario exitosamente creado</h3>
+                <p class="locations-buttons" id="closeAddUser">Volver</p>
+            </div>
         </section>
     </main>
-<script type="module" src="frontend.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>

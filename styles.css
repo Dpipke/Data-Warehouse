@@ -54,6 +54,7 @@ main{
     border-radius: 2px;
     border-radius: 2px;
     text-align: center;
+    color: white;
 }
 .addRegion{
     transform: translateY(-120%);
@@ -101,7 +102,7 @@ main{
     position: fixed;
     top: 7%;
     width: 90vw;
-    height: 60vh;
+    height: 80vh;
     background: rgba(255,255,255,1);
     z-index: 1;
     display: flex;
@@ -143,5 +144,69 @@ td{
    align-self: flex-start;
 }
 form{
-    margin-bottom: 12%;
+    margin-bottom:3%;
+}
+fieldset{
+    display: flex;
+    flex-flow: row nowrap;
+    width: 80vw;
+    border: 1px white;
+}
+.addCompanyWindow{
+   display: flex;
+   flex-direction: column;
+   justify-content:space-between;
+}
+label{
+    margin: 2%;
+}
+.headerCompany{
+    padding: 5vh;
+    padding-right: 0;
+    padding-left: 0;
+    display:flex ;
+}
+.registerFieldset{
+    transform: translateY(-40%);   
+    border-radius: 6.5px;
+    border: 3px solid #0683F9;
+    background-color: rgba(255,255,255,1) ;
+}
+
+.headerCompany h2{
+    color: white;
+    margin: 0%; 
+    margin-left: 2%;
+}
+.addRegisterButton{
+    background: #429C41;
+    color: white;
+    margin: 3%;
+    padding: 3%;
+}
+.cancelAddRegister{
+    color: #F03738;
+    background: white;
+    padding: 3%;
+    margin: 3%;
+    margin-right: 5%;
+}
+.buttons{
+    display: flex;
+    flex-direction: row;
+    align-self: flex-end;
+    text-align: center;
+    width: 20vw;
+
+
+}
+input{
+    border: 1px solid #CCCCCC;
+    border-radius: 3px;
+    padding: 2%;
+}
+
+.sucessfullyCreated{
+    width: 30vw;
+    height: 20vh;
 }

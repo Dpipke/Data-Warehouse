@@ -9,6 +9,7 @@ var companySection = document.getElementById('company-section');
 var regionSection = document.getElementById('region-section');
 var usersTable = document.getElementById('users-table');
 var companyTable = document.getElementById('company-table');
+var updateLocationSection = document.getElementById('update-location');
 var deleteLocationSection = document.getElementById('delete-location');
 var locationToDelete = document.getElementById('locationToDelete');
 var addLocation = document.getElementById('add-location');
@@ -27,6 +28,12 @@ regionLi.addEventListener('click', function () {
 
 var yesButton = document.getElementById('yesButton');
 var noButton = document.getElementById('noButton');
+var cancelUpdateLocation = document.getElementById('cancel-update-section');
+var updateLocationButton = document.getElementById('update-location-button');
+var inputLocationToUpdate = document.getElementById('inputlocationToUpdate');
+cancelUpdateLocation.addEventListener('click', function () {
+  return closeWindow(updateLocationSection, regionSection);
+});
 
 function openLi(model, liSection, path, table) {
   liSection.classList.remove('dnone');
@@ -123,6 +130,37 @@ function deleteRegister(path, id) {
   });
 }
 
+function updateRegister(updatedInformation, path, id) {
+  var url, response;
+  return regeneratorRuntime.async(function updateRegister$(_context4) {
+    while (1) {
+      switch (_context4.prev = _context4.next) {
+        case 0:
+          console.log(updatedInformation);
+          url = "http://localhost:3010/".concat(path, "/{id}");
+          _context4.next = 4;
+          return regeneratorRuntime.awrap(fetch(url, {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            method: "PUT",
+            body: JSON.stringify({
+              updatedInformation: updatedInformation
+            })
+          }));
+
+        case 4:
+          response = _context4.sent;
+
+        case 5:
+        case "end":
+          return _context4.stop();
+      }
+    }
+  });
+}
+
 function renderRegions(results, liSection) {
   var addRegion = document.createElement('a');
   addRegion.innerText = 'Añadir región';
@@ -166,7 +204,10 @@ function renderRegions(results, liSection) {
         return openAddButton('Ciudad', countryDiv.id);
       });
       deleteLocationButton.addEventListener('click', function () {
-        return openDeleteWindow(p.innerText, deleteLocationButton.id);
+        return openWindow('delete', p.innerText, deleteLocationButton.id, deleteLocationSection);
+      });
+      editLocationButton.addEventListener('click', function () {
+        return openWindow('update', p.innerText, editLocationButton.id, updateLocationSection);
       });
       editLocationButton.id = 'Country ' + item.countryId;
       deleteLocationButton.id = 'Country ' + item.countryId;
@@ -194,7 +235,10 @@ function renderRegions(results, liSection) {
         editLocationButton.classList = 'locations-buttons editLocation editCity';
         deleteLocationButton.classList = 'locations-buttons deleteLocation deleteCity';
         deleteLocationButton.addEventListener('click', function () {
-          return openDeleteWindow(p.innerText, deleteLocationButton.id);
+          return openWindow('delete', p.innerText, deleteLocationButton.id, deleteLocationSection);
+        });
+        editLocationButton.addEventListener('click', function () {
+          return openWindow('update', p.innerText, editLocationButton.id, updateLocationSection);
         });
         countryDiv.appendChild(editLocationButton);
         countryDiv.appendChild(deleteLocationButton);
@@ -269,33 +313,57 @@ function openAddButton(model, modelDependentOnId) {
   }
 }
 
-function openDeleteWindow(place, buttonClickedId) {
+function openWindow(method, place, buttonClickedId, section) {
   var model = buttonClickedId.split(' ')[0];
   var placeId = buttonClickedId.split(' ')[1];
-  deleteLocationSection.classList.remove('dnone');
-  deleteLocationSection.classList.add('fixed-window');
+  section.classList.remove('dnone');
+  section.classList.add('fixed-window');
   locationToDelete.innerText = place + '?';
   console.log(model);
 
-  if (model == 'Region') {
-    var path = 'regions';
-    yesButton.addEventListener('click', function () {
-      return deleteRegister(path, placeId);
-    });
+  if (method == 'update') {
+    switch (model) {
+      case 'Region':
+        updateLocationButton.addEventListener('click', function () {
+          return updateRegister(inputLocationToUpdate.value, 'regions', placeId);
+        });
+        break;
+
+      case 'Country':
+        updateLocationButton.addEventListener('click', function () {
+          return updateRegister(inputLocationToUpdate.value, 'countries', placeId);
+        });
+        break;
+
+      case 'City':
+        updateLocationButton.addEventListener('click', function () {
+          return updateRegister(inputLocationToUpdate.value, 'cities', placeId);
+        });
+        break;
+    }
   }
 
-  if (model == 'Country') {
-    var _path = 'countries';
-    yesButton.addEventListener('click', function () {
-      return deleteRegister(_path, placeId);
-    });
-  }
+  if (method == 'delete') {
+    if (model == 'Region') {
+      var path = 'regions';
+      yesButton.addEventListener('click', function () {
+        deleteRegister(path, placeId), closeWindow(deleteLocationSection, regionSection, 'regions', 'Region');
+      });
+    }
 
-  if (model == 'City') {
-    var _path2 = 'cities';
-    yesButton.addEventListener('click', function () {
-      return deleteRegister(_path2, placeId);
-    });
+    if (model == 'Country') {
+      var _path = 'countries';
+      yesButton.addEventListener('click', function () {
+        deleteRegister(_path, placeId), closeWindow(deleteLocationSection, regionSection, 'regions', 'Region');
+      });
+    }
+
+    if (model == 'City') {
+      var _path2 = 'cities';
+      yesButton.addEventListener('click', function () {
+        deleteRegister(_path2, placeId), closeWindow(deleteLocationSection, regionSection, 'regions', 'Region');
+      });
+    }
   }
 }
 
@@ -304,4 +372,10 @@ function openCommands(actionsButton, deleteButton, editButton) {
 
   deleteButton.classList.remove('dnone');
   editButton.classList.remove('dnone');
+}
+
+function closeWindow(window, mainSection) {
+  window.className = "";
+  window.classList.add('dnone'); // mainSection.innerHTML = ""
+  // ver como recargar la pagin
 }
