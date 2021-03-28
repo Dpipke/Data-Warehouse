@@ -422,7 +422,7 @@ function openAddButton(model, modelDependentOnId, window) {
               });
             });
 
-            if (postUserPassword === postUserRepeatPassword) {
+            if (postUserPassword.value == postUserRepeatPassword.value) {
               addUserButton.addEventListener('click', function () {
                 var userBody = {
                   name: postUserName.value,

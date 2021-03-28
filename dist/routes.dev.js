@@ -92,16 +92,10 @@ app.post('/users', function _callee4(req, res) {
             password: req.body.body.password,
             repeatPassword: req.body.body.repeatPassword
           };
-
-          if (!(user.password === user.repeatPassword)) {
-            _context4.next = 9;
-            break;
-          }
-
-          _context4.next = 5;
+          _context4.next = 4;
           return regeneratorRuntime.awrap(checkUserInDB(user));
 
-        case 5:
+        case 4:
           existsUser = _context4.sent;
 
           if (existsUser.length == 0) {
@@ -154,13 +148,7 @@ app.post('/users', function _callee4(req, res) {
             res.status(400).send("Unexistent user. Contact Admin");
           }
 
-          _context4.next = 10;
-          break;
-
-        case 9:
-          res.status(404).send("Las contrasenias deben ser iguales");
-
-        case 10:
+        case 6:
         case "end":
           return _context4.stop();
       }

@@ -62,7 +62,6 @@ app.post('/users',  async (req, res)=>{
         password: req.body.body.password,
         repeatPassword: req.body.body.repeatPassword
     }
-    if(user.password === user.repeatPassword){
         const existsUser = await checkUserInDB(user)
         if(existsUser.length == 0){
             const saltRounds = 10;
@@ -77,9 +76,7 @@ app.post('/users',  async (req, res)=>{
         else{
             res.status(400).send("Unexistent user. Contact Admin")
         }
-    }else{
-        res.status(404).send("Las contrasenias deben ser iguales")
-    }
+
     
 })
 

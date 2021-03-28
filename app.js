@@ -300,7 +300,7 @@ async function openAddButton(model, modelDependentOnId, window){
         addLocationButton.addEventListener('click', ()=> addNewRegister('regions', {
             name: newLocation.value
         }))
-        if(postUserPassword===postUserRepeatPassword){
+        if(postUserPassword.value==postUserRepeatPassword.value){
         addUserButton.addEventListener('click', () => {
             const userBody = {
                 name: postUserName.value,
