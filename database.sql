@@ -29,10 +29,14 @@ CREATE TABLE contact_channels(
     contactId INT(10) NOT NULL,
     contact_channel_id INT(10) NOT NULL,
     user_account VARCHAR(64) NOT NULL,
-    preferencies_id INT(10)
+    preferences_id INT(10)
     );
 CREATE TABLE contact_social_media(
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(64)
     );
-CREATE TABLE preferencies( id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(64) );
+CREATE TABLE preferences( id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCHAR(64) );
+
+ALTER TABLE contacts
+ADD COLUMN address VARCHAR(64),
+ADD COLUMN cityId INT(10) NOT NULL 

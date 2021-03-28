@@ -4,15 +4,13 @@ const {User} = require('./database-models')
 
 async function createUser(userProvided){
     const role = userProvided.admin === "Admin"
-    const userToCreate = await User.create({name: userProvided.name, lastname: userProvided.lastname, email: userProvided.email, admin: role})
+    const userToCreate = await User.create({name: userProvided.name, lastname: userProvided.lastname, email: userProvided.email, admin: role, password: userProvided.hash})
 }
 
 async function checkUserInDB(user){
-    const role = user.admin === "Admin"
     const userToCheck = User.findAll({
     where: {
     email: user.email,
-    admin: role
   }
 });
     return userToCheck

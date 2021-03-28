@@ -1,13 +1,32 @@
-const {Sequelize, DataTypes} = require("sequelize")
+const {Sequelize, DataTypes, json} = require("sequelize")
 const {Region, Country, City, Company, User, Contact, ChannelSocialMedia, Preferency} = require('./database-models')
 
-async function getAllRegisters(model){ 
+async function getAllRegisters(model, id){ 
     switch(model) {
         case 'Region': 
             const regionsData = await Region.findAll({});
             const countriesData = await Country.findAll({});
             const citiesData = await City.findAll({});
             return [regionsData, countriesData, citiesData]
+
+        break;
+        case 'Country': 
+        const countriesArray = await Country.findAll({
+            where:{
+                RegionId: id
+            }
+        });
+        return countriesArray
+
+        break;
+        case 'City': 
+        const citiesArray = await City.findAll({
+            where:{
+                CountryId: id
+            }
+        });
+        return citiesArray
+
         break;
         case 'Company': 
             const companiesTable = await Company.findAll({
@@ -28,25 +47,9 @@ async function getAllRegisters(model){
             // const allUsers = JSON.stringify(usersTable)
             // console.log(allUsers)
             return usersTable
-        break;
-        case 'Contact':
-            const contactsTable =  await Contact.findAll({
-                attributes: ['name'],
-                foreignKey: 'RegionId',
-                include: {
-                    // model: Country,
-                    all: true,
-                    nested: true,
-                    required: true,
-                    // include:{model: City, required: true}
-                }},
-                );
-                // const allRegisters = JSON.stringify(locationsTable)
-                // console.log(allRegisters)
-                return locationsTable
-            }
+    }
 
-      }
+}
 
 async function updateRegister(model, register){
     const set = Object.keys(register).filter(key => register[key] != null && key != "id").map(key => `${key} : ${JSON.stringify(register[key])}`).join(",")
@@ -129,7 +132,8 @@ async function deleteRegister(model, id){
         break;
     }
 }   
-async function addNewLocation(model, name, id){
+async function addNewRegister(model, name, id){
+    console.log(name)
     switch(model) {
         case 'Region': const newRegion = await Region.create({ name: name});
             console.log(newRegion)
@@ -147,5 +151,5 @@ async function addNewLocation(model, name, id){
    
 }
 
-module.exports = {getAllRegisters, addNewLocation, updateRegister, deleteRegister}
+module.exports = {getAllRegisters, addNewRegister, updateRegister, deleteRegister}
 

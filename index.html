@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Warehouse</title>
     <link rel="stylesheet" href="styles.css">
-
+    <script src="https://kit.fontawesome.com/f2faff9cdd.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
@@ -20,9 +20,45 @@
         </nav>
     </header>
     <main>
+        <section class="dnone">
+            <div class="header-section"></div>
+            <h1>Bienvenido</h1>
+            <input type="text" placeholder="Usuario" id="userLogin">
+            <input type="text" placeholder="Contraseña" id="passwordLogin">
+            <p class="locations-buttons" id="loginButton">Ingresar </p>
+        </section>
         <section class="dnone" id="contacts-section">
-            <input type="text">
-            <img src="" alt="lens">
+            <div class="contactsHeader">
+                <div class="searchDiv">
+                    <input type="text" class="searchInput">
+                    <i class="fas fa-caret-down" id="arrowDownSearch"></i>
+                </div>
+                <div class="dnone" id="searchOptions">
+                    <p>Nombre del Cargo</p>
+                    <input type="text" id="inputContactName">
+                    <p>Cargo</p>
+                    <input type="text" id="inputContactPosition">
+                    <p>País/Region</p>
+                    <select name="" id="inputContactLocation"></select>
+                    <p>Compañía</p>
+                    <select name="" id="inputContactCompany"></select>
+                </div>
+                <i class="fas fa-search" id="searchLens"></i>
+                <div>
+                    <i class="fas fa-download"></i>
+                    <i class="fas fa-sort-down">Exportar contactos</i>
+                    <p>Agregar contacto</p>
+                </div>
+            </div>
+            <table id="contacts-table">
+                <th>Contacto</th>
+                <th>País/Región</th>
+                <th>Compañía</th>
+                <th>Cargo</th>
+                <th>Canal Preferido</th>
+                <th>Interés</th>
+                <th>Acciones</th>
+            </table>
         </section>
         <section class='dnone' id="region-section">
             <div class='dnone' id="add-location">
@@ -72,33 +108,39 @@
                     <fieldset class="registerFieldset">
                         <label for="name">
                             <p>Nombre</p>
-                            <input type="text" name="name">
+                            <input type="text" name="name" id="inputCompanyName">
                         </label>
                         <label for="address">
                             <p>Dirección</p>
-                            <input type="text" name="address">
+                            <input type="text" name="address" id="inputCompanyAddress">
                         </label>
                         <label for="email">
                             <p>Email</p>
-                            <input type="text" name="email">
+                            <input type="text" name="email" id="inputCompanyEmail">
                         </label>
                         <label for="telephone">
                             <p>Teléfono</p>
-                            <input type="text" name="telephone">
+                            <input type="text" name="telephone" id="inputCompanyTelephone">
                         </label>
                     </fieldset>
                     <fieldset>
-                        <label for="city">
-                            <p>Ciudad</p>
-                            <input type="text" name="city">
+                        <label for="region">
+                            <p>Región</p>
+                            <select name="region" required id="postCompanyRegion">
+                                <option value="-">Seleccione...</option>
+                            </select>                        
                         </label>
                         <label for="country">
                             <p>País</p>
-                            <input type="text" name="country">
+                            <select name="country" required id="postCompanyCountry">
+                                <option value="">Seleccione...</option>
+                            </select>
                         </label>
-                        <label for="region">
-                            <p>Región</p>
-                            <input type="text" name="region">
+                        <label for="city">
+                            <p>Ciudad</p>
+                            <select name="city" required id="postCompanyCity">
+                                <option value="">Seleccione...</option>
+                            </select>
                         </label>
                     </fieldset>
                 </form>
@@ -136,6 +178,14 @@
                             <p>Email</p>
                             <input type="text" name="email" id="postUserEmail" required>
                         </label>
+                        <label for="password">
+                            <p>Contraseña</p>
+                            <input type="text" name="password" id="postUserPassword" required>
+                        </label>
+                        <label for="repeatPassword">
+                            <p>Contraseña</p>
+                            <input type="text" name="repeatPassword" id="postUserRepeatPassword" required>
+                        </label>
                         <label for="role">
                             <p>Rol</p>
                             <select name="role" required id="postUserRole">
@@ -145,6 +195,7 @@
                         </label>
                     </fieldset>
                 </form>
+                <p class="dnone" id="invalidPassword">Las Contraseñas deben ser identicas</p>
                 <div class="buttons">
                     <p class="locations-buttons cancelAddRegister" id="cancelAddUser">Cancelar</p>
                     <p class="locations-buttons addRegisterButton" id="addUserButton">Agregar Usuario</p>
@@ -154,6 +205,46 @@
                 <div class="header-section"></div>
                 <h3>Usuario exitosamente creado</h3>
                 <p class="locations-buttons" id="closeAddUser">Volver</p>
+            </div>
+            <div class="dnone" id="deleteUserSection">
+                <div class="header-section"></div>
+                <p>¿Esta seguro que desea eliminar a</p><p id="userToDelete"></p>
+                <div class="deleteButtons">
+                    <p class="locations-buttons cancelDeleteRegister" id="cancelDeleteUser">Cancelar</p>
+                    <p class="locations-buttons confirmDeleteRegister" id="deleteUserButton">Eliminar</p>    
+                </div>
+            </div>
+            <div class="dnone" id="updateUserWindow">
+                <div class="header-section headerCompany">
+                    <h2>Editar Usuario</h2>
+                </div>
+                <form action="post" class="addRegisterForm">
+                    <fieldset class="registerFieldset">
+                        <label for="name">
+                            <p>Nombre</p>
+                            <input type="text" name="name" id="editUserName" required>
+                        </label>
+                        <label for="lastname">
+                            <p>Apellido</p>
+                            <input type="text" name="lastname" id="editUserLastname" required>
+                        </label>
+                        <label for="email">
+                            <p>Email</p>
+                            <input type="text" name="email" id="editUserEmail" required>
+                        </label>
+                        <label for="role">
+                            <p>Rol</p>
+                            <select name="role" required id="editUserRole">
+                                <option value="Basic" selected>Básico</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </label>
+                    </fieldset>
+                </form>
+                <div class="buttons">
+                    <p class="locations-buttons cancelAddRegister" id="cancelAddUser">Cancelar</p>
+                    <p class="locations-buttons addRegisterButton" id="addUserButton">Editar Usuario</p>
+                </div>
             </div>
         </section>
     </main>

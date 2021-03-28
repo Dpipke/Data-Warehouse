@@ -14,10 +14,11 @@ const {createUser,
         updateUserInformation
     } = require('./database-UserFunctions')
 const {getAllRegisters,
-        addNewLocation,
+        addNewRegister,
         updateRegister,
         deleteRegister
     } = require('./database-RegionsAndCompaniesFunctions');
+const {getContacts}= require('./database-ContactFunctions')
 
 
 app.use(bodyParser.json())
@@ -52,14 +53,33 @@ app.get('/users', async (req, res)=>{
     res.status(200).json(allUsers)
 })
 app.post('/users',  async (req, res)=>{
+    console.log('anda')
     const user = {
         name: req.body.body.name,
         lastname: req.body.body.lastname,
         email: req.body.body.email,
         admin: req.body.body.role, 
+        password: req.body.body.password,
+        repeatPassword: req.body.body.repeatPassword
     }
-    const userCreated= await createUser(user)
-    res.status(201).json(userCreated)
+    if(user.password === user.repeatPassword){
+        const existsUser = await checkUserInDB(user)
+        if(existsUser.length == 0){
+            const saltRounds = 10;
+            bcrypt.genSalt(saltRounds, async function(err, salt) {
+            bcrypt.hash(user.password, salt, async function(err, hash) {
+                if (err) throw res.status(400).send("An error has happened")
+                else{
+                Object.defineProperty(user, 'hash', {value: hash})  
+            const userCreated= await createUser(user)
+            res.status(201).send('User successfully activated')
+            }})})}  
+        else{
+            res.status(400).send("Unexistent user. Contact Admin")
+        }
+    }else{
+        res.status(404).send("Las contrasenias deben ser iguales")
+    }
     
 })
 
@@ -81,6 +101,7 @@ app.delete('/users/:id', async (req, res) => {
     res.status(200).send("User successfully deleted")
     // FALTA 404 USER NOT FOUND
 })
+// sacar
 app.post('/signup', checkPassword, async (req, res)=>{
     const user = {
         name: req.body.name,
@@ -161,25 +182,45 @@ app.get('/regions' , async (req, res)=>{
     res.status(200).json(locationsArray)
 })
 
+app.get('/countries/:id', async(req, res)=>{
+    const regionId = req.params.id
+    const allCountries = await getAllRegisters('Country', regionId)
+    const countriesArray = []
+    const mappedCountries = allCountries.map( country=>{
+        const eachCountry = Object.assign({"countryName": country.dataValues.name, "countryId":country.dataValues.id})
+        countriesArray.push(eachCountry)
+    })
+    res.status(200).json(countriesArray)
+})
+app.get('/cities/:id', async(req, res)=>{
+    const countryId = req.params.id
+    const allCities = await getAllRegisters('City', countryId)
+    const citiesArray = []
+    const mappedCities = allCities.map( city=>{
+        const eachCity = Object.assign({"cityName": city.dataValues.name, "cityId":city.dataValues.id})
+        citiesArray.push(eachCity)
+    })
+    res.status(200).json(citiesArray)
+})
+
 app.post('/regions', async (req, res) =>{
-    const name = req.body.name
+    const name = req.body.body.name
     const id = req.body.id
-    console.log(name, id)
-    addNewLocation('Region',name, id); 
+    addNewRegister('Region',name, id); 
 } )
 
 app.post('/countries', async (req, res) =>{
-    const name = req.body.name
-    const regionId = req.body.id
+    const name = req.body.body.name
+    const regionId = req.body.body.id
     console.log(name, regionId)
-    addNewLocation('Country',name, regionId); 
+    addNewRegister('Country',name, regionId); 
 } )
 
 app.post('/cities', async (req, res) =>{
-    const name = req.body.name
-    const countryId = req.body.id
+    const name = req.body.body.name
+    const countryId = req.body.body.id
     console.log(name, countryId)
-    addNewLocation('City',name, countryId); 
+    addNewRegister('City',name, countryId); 
 } )
 app.put('/regions/:id', async (req, res) =>{
     const name = req.body
@@ -226,13 +267,13 @@ app.get('/companies', async (req, res)=>{
 
 app.post('/companies', async (req, res)=>{
     const newCompany = {
-        name: req.body.name,
-        cityId: req.body.cityId,
-        address: req.body.address,
-        email: req.body.email,
-        telephone: req.body.telephone
+        name: req.body.body.name,
+        cityId: req.body.body.cityId,
+        address: req.body.body.address,
+        email: req.body.body.email,
+        telephone: req.body.body.telephone
     }
-    addNewLocation('Company', newCompany)
+    addNewRegister('Company', newCompany)
 })
 app.put('/companies', async (req, res)=>{
     const companyToUpdate ={
@@ -252,8 +293,9 @@ app.delete('/companies/:id', async (req, res)=>{
 })
 
 app.get('/contacts', async(req, res)=>{
-    const allContacts = await getAllRegisters('Contact')
-    res.status(200).json(allContacts)
+    const allContacts = await getContacts()
+    console.log(allContacts)
+    // res.status(200).json(allContacts)
 })
 
 app.listen(3010, () => console.log("server started"))

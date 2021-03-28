@@ -5,8 +5,10 @@ const regionLi = document.getElementById('region-li')
 const usersSection = document.getElementById('users-section')
 const companySection = document.getElementById('company-section')
 const regionSection = document.getElementById('region-section')
+const contactsSection = document.getElementById('contacts-section')
 const usersTable = document.getElementById('users-table')
 const companyTable = document.getElementById('company-table')
+const contactsTable = document.getElementById('contacts-table')
 
 const updateLocationSection = document.getElementById('update-location')
 const deleteLocationSection = document.getElementById('delete-location')
@@ -18,7 +20,7 @@ const addLocationTitle = document.getElementById('addLocation-title')
 usersLi.addEventListener('click', () => openLi('User', usersSection, 'users', usersTable))
 companyLi.addEventListener('click', () => openLi('Company', companySection, 'companies', companyTable))
 regionLi.addEventListener('click', () => openLi('Region', regionSection, 'regions'))
-// contactsLi.addEventListener('click', () => openLi())
+contactsLi.addEventListener('click', () => openLi('Contacts', contactsSection, 'contacts', contactsTable))
 
 const yesButton=  document.getElementById('yesButton')
 const noButton = document.getElementById('noButton')
@@ -29,10 +31,45 @@ cancelUpdateLocation.addEventListener('click', ()=> closeWindow(updateLocationSe
 
 const addCompanyWindow = document.getElementById('addCompanyWindow')
 const addCompanyButton = document.getElementById('addCompanyButton-openWindow')
+const addCompanyToDBButton = document.getElementById('addCompanyButton')
 const cancelAddCompany = document.getElementById('cancelAddCompany')
+const postCompanyRegion = document.getElementById('postCompanyRegion')
+const postCompanyCountry = document.getElementById('postCompanyCountry')
+const postCompanyCity = document.getElementById('postCompanyCity')
+
+const inputCompanyName = document.getElementById('inputCompanyName')
+const inputCompanyAddress = document.getElementById('inputCompanyAddress')
+const inputCompanyEmail = document.getElementById('inputCompanyEmail')
+const inputCompanyTelephone = document.getElementById('inputCompanyTelephone')
+
+const arrowDownSearch = document.getElementById('arrowDownSearch')
+const searchOptions = document.getElementById('searchOptions')
+arrowDownSearch.addEventListener('click', ()=> {
+    searchOptions.classList.remove('dnone')
+    searchOptions.classList.add('searchOptions')
+} )
+const inputContactName = document.getElementById('inputContactName')
+const inputContactPosition = document.getElementById('inputContactPosition')
+const inputContactLocation = document.getElementById('inputContactLocation')
+const inputContactCompany = document.getElementById('inputContactCompany')
+const searchLens = document.getElementById('searchLens')
+// searchLens.addEventListener('submit', )
 
 addCompanyButton.addEventListener('click', ()=>openAddButton('companies', null,addCompanyWindow ))
 cancelAddCompany.addEventListener('click', ()=> closeWindow(addCompanyWindow, regionSection))
+addCompanyToDBButton.addEventListener('click', ()=>addNewRegister(
+    'companies',
+    {
+        name: inputCompanyName.value,
+        cityId: postCompanyCity.options[postCompanyCity.selectedIndex].value,
+        address: inputCompanyAddress.value,
+        email: inputCompanyEmail.value,
+        telephone: inputCompanyTelephone.value
+    }, 
+    null,
+    null,
+    null,
+    null))
 
 const addUserButtonOpenWindow = document.getElementById('addUserButton-openWindow')
 const addUserWindow = document.getElementById('addUserWindow')
@@ -40,11 +77,19 @@ const postUserName = document.getElementById('postUserName')
 const postUserLastname = document.getElementById('postUserLastname')
 const postUserEmail = document.getElementById('postUserEmail')
 const postUserRole = document.getElementById('postUserRole')
+const postUserPassword = document.getElementById('postUserPassword')
+const postUserRepeatPassword = document.getElementById('postUserRepeatPassword')
+const invalidPassword = document.getElementById('invalidPassword')
 const cancelAddUser = document.getElementById('cancelAddUser')
 const addUserButton = document.getElementById('addUserButton')
 const closeAddUserWindow = document.getElementById('closeAddUserWindow')
 const closeAddUser = document.getElementById('closeAddUser')
+const deleteUserSection = document.getElementById('deleteUserSection')
+const userToDelete = document.getElementById('userToDelete')
+const deleteUserButton = document.getElementById('deleteUserButton')
+const cancelDeleteUser = document.getElementById('cancelDeleteUser')
 addUserButtonOpenWindow.addEventListener('click', ()=> openAddButton('users', null, addUserWindow))
+cancelDeleteUser.addEventListener('click', ()=>closeWindow(deleteUserSection, usersSection))
 
 function openLi(model, liSection, path, table){
     if(liSection.classList == 'dnone'){
@@ -87,6 +132,7 @@ async function addNewRegister(path,  body, window, mainSection, successWindow, c
             closeWindow(window, mainSection)
         })
     }
+   
 }
 
 async function deleteRegister(path, id){
@@ -187,37 +233,43 @@ function renderTable(results, table, path, model){
     results.forEach(item => {
     console.log(item)
     const tr = document.createElement('tr')
-    const actionsButton = document.createElement('img')
-    const editButton = document.createElement('img')
-    const deleteButton = document.createElement('img')
-    actionsButton.src = ''
+    const actionsButton = document.createElement('i')
+    const editButton = document.createElement('i')
+    const deleteButton = document.createElement('i')
+    const allButtonsDiv = document.createElement('div')
+    const buttonsDiv = document.createElement('div')
     actionsButton.alt = 'action'
-    actionsButton.classList = 'dblock'
-    deleteButton.src = ''
+    actionsButton.classList = 'fas fa-ellipsis-v'
     deleteButton.alt = 'delete'
-    deleteButton.classList = 'dnone'
-    editButton.src = ''
+    deleteButton.classList = 'fas fa-trash'
     editButton.alt = 'edit'
-    editButton.classList = 'dnone'
+    editButton.classList = 'fas fa-pen'
+    buttonsDiv.classList = 'dnone'
+    allButtonsDiv.classList= 'allButtons'
     tr.id = item.id
     delete item.id
-    actionsButton.addEventListener('click', () => openCommands(actionsButton, deleteButton, editButton))
-    deleteButton.addEventListener('click', () =>  deleteRegister(path, tr.id))
-    // editButton.addEventListener('click', )
+    actionsButton.addEventListener('click', () => {
+        buttonsDiv.classList.remove('dnone')
+        buttonsDiv.classList.add('buttonsDiv')
+    })
+    buttonsDiv.appendChild(editButton)
+    buttonsDiv.appendChild(deleteButton)
+    allButtonsDiv.appendChild(actionsButton)
+    allButtonsDiv.appendChild(buttonsDiv)
+    deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow('delete', item.name+" "+ item.lastname , tr.id, deleteUserSection, usersSection, buttonsDiv))
+    editButton.addEventListener('click', () => openCompaniesOrUsersWindow())
     const registerValues = Object.values(item)
     registerValues.forEach( register =>{
         const td = document.createElement('td')
         td.innerText = register   
         tr.appendChild(td)
-        tr.appendChild(actionsButton)
-        tr.appendChild(deleteButton)
-        tr.appendChild(editButton)
+        tr.appendChild(allButtonsDiv)
         table.appendChild(tr)
     })
     })
 }
 
-function openAddButton(model, modelDependentOnId, window){
+async function openAddButton(model, modelDependentOnId, window){
     window.classList.remove('dnone')
     window.classList.add('fixed-window')
     if(window == addCompanyWindow){
@@ -232,33 +284,66 @@ function openAddButton(model, modelDependentOnId, window){
             id: id
         }
         if(modelDependentOn == 'Region'){
-            addLocationButton.addEventListener('click', ()=> addNewRegister('countries', locationBody))
+            addLocationButton.addEventListener('click', ()=> addNewRegister('countries', 
+            {
+                name: newLocation.value,
+                id: id
+            }))
         }
         if(modelDependentOn == 'Country'){
-            addLocationButton.addEventListener('click', ()=> addNewRegister('cities', locationBody))
+            addLocationButton.addEventListener('click', ()=> addNewRegister('cities', {
+                name: newLocation.value,
+                id: id
+            }))
         }
     }else{
-        const locationBody ={
+        addLocationButton.addEventListener('click', ()=> addNewRegister('regions', {
             name: newLocation.value
-        }
-        addLocationButton.addEventListener('click', ()=> addNewRegister('regions', locationBody))
+        }))
+        if(postUserPassword===postUserRepeatPassword){
         addUserButton.addEventListener('click', () => {
             const userBody = {
                 name: postUserName.value,
                 lastname: postUserLastname.value,
                 email: postUserEmail.value,
+                password: postUserPassword.value,
                 role: postUserRole.value
             }
             addNewRegister('users', userBody, addUserWindow, usersSection, closeAddUserWindow, closeAddUser)})
-    }
-}
+           if(window == addCompanyWindow){
+                assignRegionToForm()
+                changeCountry()
+        addCompanyButton.addEventListener('click', () => {})
+    }else{
+        invalidPassword.classList.remove('dnone')
+        invalidPassword.classList.add('warning')
 
-function openWindow(method, place, buttonClickedId, section){
+    }}}
+}
+const userLogin = document.getElementById('userLogin')
+const passwordLogin = document.getElementById('passwordLogin')
+const loginButton = document.getElementById('loginButton')
+
+loginButton.addEventListener('click',async ()=>{
+    const userLoginValue = userLogin.value
+    const passwordLoginValue = passwordLogin.value
+    const url = `http://localhost:3010/login`
+    const response = await fetch(url,{
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify({user: userLoginValue, password: passwordLoginValue})
+    })
+    const resultsStatus = await response.status
+    console.log(resultsStatus)
+
+})
+function openWindow(method, registerToDelete, buttonClickedId, section){
     const model = buttonClickedId.split(' ')[0]
     const placeId = buttonClickedId.split(' ')[1]
-    section.classList.remove('dnone')
-    section.classList.add('fixed-window')
-    locationToDelete.innerText = place +'?'
+    locationToDelete.innerText = registerToDelete +'?'
     console.log(model)
     console.log(placeId)
     if(method == 'update'){
@@ -287,17 +372,21 @@ function openWindow(method, place, buttonClickedId, section){
             const path = 'cities'
             yesButton.addEventListener('click', () => {
                 deleteRegister(path, placeId), closeWindow(deleteLocationSection, regionSection, 'regions',  'Region')})
-        }
+        }}
 
 }
-}
-function openCommands(actionsButton, deleteButton, editButton){
-    actionsButton.classList.remove('dblock')
-    // actionsButton.classList.add('dnone')
-    deleteButton.classList.remove('dnone')
-    editButton.classList.remove('dnone')
 
-}
+
+function openCompaniesOrUsersWindow(db, method, registerToDelete, buttonClickedId, window, section, buttonsDiv){
+    window.classList.remove('dnone')
+    window.classList.add('fixed-window')
+    buttonsDiv.classList = ""
+    buttonsDiv.classList.add('dnone')
+    userToDelete.innerText = registerToDelete + " de la base de datos de usuarios?"
+    deleteUserButton.addEventListener('click', () => {
+        deleteRegister('users', buttonClickedId),
+        closeWindow(window, section)
+})}
 
 function closeWindow(window, mainSection){
     window.className = ""
@@ -305,3 +394,48 @@ function closeWindow(window, mainSection){
     // mainSection.innerHTML = ""
     // ver como recargar la pagin
 }
+
+async function getLocations(){
+    const url = `http://localhost:3010/regions`
+    const response = await fetch(url)
+    const results = await response.json()
+    return results
+}
+async function assignRegionToForm(){
+    const allLocations = await getLocations()
+    allLocations.forEach( region =>{
+        const option = document.createElement('option')
+        option.innerText = region.regionName
+        option.id = region.regionId
+        option.value = region.regionId
+        postCompanyRegion.appendChild(option)
+})
+}
+
+async function changeCountry(){
+    postCompanyRegion.addEventListener('change', async (event)=>{
+        const chosenRegionId = postCompanyRegion.options[postCompanyRegion.selectedIndex].value
+        const url = `http://localhost:3010/countries/${chosenRegionId}`
+        const response = await fetch(url)
+        const results = await response.json()
+        results.forEach( country =>{
+            const option = document.createElement('option')
+            option.innerText = country.countryName
+            option.id = country.countryId
+            option.value = country.countryId
+            postCompanyCountry.appendChild(option)
+            postCompanyCountry.addEventListener('change', async (event)=>{
+                const chosenCountryId = postCompanyCountry.options[postCompanyCountry.selectedIndex].value
+                const cityUrl = `http://localhost:3010/cities/${chosenCountryId}`
+                const cityResponse = await fetch(cityUrl)
+                const cityResults = await cityResponse.json()
+                console.log(cityResults)
+                cityResults.forEach(city =>{
+                    const option = document.createElement('option')
+                    option.innerText = city.cityName
+                    option.id = city.cityId
+                    option.value = city.cityId
+                    postCompanyCity.appendChild(option)
+                })
+            })
+})})}

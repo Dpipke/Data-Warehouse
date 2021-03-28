@@ -2,7 +2,8 @@
 
 var _require = require("sequelize"),
     Sequelize = _require.Sequelize,
-    DataTypes = _require.DataTypes;
+    DataTypes = _require.DataTypes,
+    json = _require.json;
 
 var _require2 = require('./database-models'),
     Region = _require2.Region,
@@ -14,14 +15,14 @@ var _require2 = require('./database-models'),
     ChannelSocialMedia = _require2.ChannelSocialMedia,
     Preferency = _require2.Preferency;
 
-function getAllRegisters(model) {
-  var regionsData, countriesData, citiesData, companiesTable, usersTable, contactsTable;
+function getAllRegisters(model, id) {
+  var regionsData, countriesData, citiesData, countriesArray, citiesArray, companiesTable, usersTable;
   return regeneratorRuntime.async(function getAllRegisters$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
           _context.t0 = model;
-          _context.next = _context.t0 === 'Region' ? 3 : _context.t0 === 'Company' ? 14 : _context.t0 === 'User' ? 20 : _context.t0 === 'Contact' ? 25 : 29;
+          _context.next = _context.t0 === 'Region' ? 3 : _context.t0 === 'Country' ? 14 : _context.t0 === 'City' ? 19 : _context.t0 === 'Company' ? 24 : _context.t0 === 'User' ? 30 : 34;
           break;
 
         case 3:
@@ -44,6 +45,30 @@ function getAllRegisters(model) {
 
         case 14:
           _context.next = 16;
+          return regeneratorRuntime.awrap(Country.findAll({
+            where: {
+              RegionId: id
+            }
+          }));
+
+        case 16:
+          countriesArray = _context.sent;
+          return _context.abrupt("return", countriesArray);
+
+        case 19:
+          _context.next = 21;
+          return regeneratorRuntime.awrap(City.findAll({
+            where: {
+              CountryId: id
+            }
+          }));
+
+        case 21:
+          citiesArray = _context.sent;
+          return _context.abrupt("return", citiesArray);
+
+        case 24:
+          _context.next = 26;
           return regeneratorRuntime.awrap(Company.findAll({
             attributes: ['id', 'name', 'address', 'email', 'telephone', 'cityId'],
             foreignKey: 'city',
@@ -54,39 +79,21 @@ function getAllRegisters(model) {
             }
           }));
 
-        case 16:
+        case 26:
           companiesTable = _context.sent;
           // const allCompanies = JSON.stringify(companiesTable)
           console.log(companiesTable);
           return _context.abrupt("return", companiesTable);
 
-        case 20:
-          _context.next = 22;
+        case 30:
+          _context.next = 32;
           return regeneratorRuntime.awrap(User.findAll());
 
-        case 22:
+        case 32:
           usersTable = _context.sent;
           return _context.abrupt("return", usersTable);
 
-        case 25:
-          _context.next = 27;
-          return regeneratorRuntime.awrap(Contact.findAll({
-            attributes: ['name'],
-            foreignKey: 'RegionId',
-            include: {
-              // model: Country,
-              all: true,
-              nested: true,
-              required: true // include:{model: City, required: true}
-
-            }
-          }));
-
-        case 27:
-          contactsTable = _context.sent;
-          return _context.abrupt("return", locationsTable);
-
-        case 29:
+        case 34:
         case "end":
           return _context.stop();
       }
@@ -214,53 +221,54 @@ function deleteRegister(model, id) {
   });
 }
 
-function addNewLocation(model, name, id) {
+function addNewRegister(model, name, id) {
   var newRegion, newCountry, newCity, newCompany;
-  return regeneratorRuntime.async(function addNewLocation$(_context4) {
+  return regeneratorRuntime.async(function addNewRegister$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
+          console.log(name);
           _context4.t0 = model;
-          _context4.next = _context4.t0 === 'Region' ? 3 : _context4.t0 === 'Country' ? 8 : _context4.t0 === 'City' ? 13 : _context4.t0 === 'Company' ? 18 : 23;
+          _context4.next = _context4.t0 === 'Region' ? 4 : _context4.t0 === 'Country' ? 9 : _context4.t0 === 'City' ? 14 : _context4.t0 === 'Company' ? 19 : 24;
           break;
 
-        case 3:
-          _context4.next = 5;
+        case 4:
+          _context4.next = 6;
           return regeneratorRuntime.awrap(Region.create({
             name: name
           }));
 
-        case 5:
+        case 6:
           newRegion = _context4.sent;
           console.log(newRegion);
-          return _context4.abrupt("break", 23);
+          return _context4.abrupt("break", 24);
 
-        case 8:
-          _context4.next = 10;
+        case 9:
+          _context4.next = 11;
           return regeneratorRuntime.awrap(Country.create({
             name: name,
             RegionId: id
           }));
 
-        case 10:
+        case 11:
           newCountry = _context4.sent;
           console.log(newCountry);
-          return _context4.abrupt("break", 23);
+          return _context4.abrupt("break", 24);
 
-        case 13:
-          _context4.next = 15;
+        case 14:
+          _context4.next = 16;
           return regeneratorRuntime.awrap(City.create({
             name: name,
             CountryId: id
           }));
 
-        case 15:
+        case 16:
           newCity = _context4.sent;
           console.log(newCity);
-          return _context4.abrupt("break", 23);
+          return _context4.abrupt("break", 24);
 
-        case 18:
-          _context4.next = 20;
+        case 19:
+          _context4.next = 21;
           return regeneratorRuntime.awrap(Company.create({
             name: name.name,
             cityId: name.cityId,
@@ -269,12 +277,12 @@ function addNewLocation(model, name, id) {
             telephone: name.telephone
           }));
 
-        case 20:
+        case 21:
           newCompany = _context4.sent;
           console.log(newCompany);
-          return _context4.abrupt("break", 23);
+          return _context4.abrupt("break", 24);
 
-        case 23:
+        case 24:
         case "end":
           return _context4.stop();
       }
@@ -284,7 +292,7 @@ function addNewLocation(model, name, id) {
 
 module.exports = {
   getAllRegisters: getAllRegisters,
-  addNewLocation: addNewLocation,
+  addNewRegister: addNewRegister,
   updateRegister: updateRegister,
   deleteRegister: deleteRegister
 };

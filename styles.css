@@ -148,7 +148,7 @@ form{
 }
 fieldset{
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row wrap;
     width: 80vw;
     border: 1px white;
 }
@@ -209,4 +209,55 @@ input{
 .sucessfullyCreated{
     width: 30vw;
     height: 20vh;
+}
+
+.buttonsDiv{
+    display: flex;
+    flex-direction: column;
+    padding: 2%;
+    margin: 2%;
+    justify-content: space-between;
+}
+.allButtons{
+    display: flex;
+    flex-direction: row;
+    align-items:  baseline;
+}
+.deleteButtons{
+    display: flex;
+    flex-direction: row;
+}
+.searchInput{
+    border:none;
+    width: 85%;
+}
+.searchDiv{
+    border: 1px solid #CCCCCC;
+    border-radius: 3px;
+    width: 40vw;
+    max-height: 5vh;
+
+}
+.contactsHeader{
+    display: flex;
+    flex-direction:row ;
+    justify-content: space-between;
+}
+.searchOptions{
+    position: absolute;
+    left: 5vw;
+    top: 10vh;
+    border: 1px solid #CCCCCC;
+    border-radius: 3px;    
+    width: 40vw;
+    display: flex;
+    flex-direction: column;
+}
+.fa-search{
+    position: absolute;
+    left: 47vw;
+}
+
+.warning{
+    color: red;
 }

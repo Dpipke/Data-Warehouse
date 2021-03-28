@@ -19,7 +19,8 @@ function createUser(userProvided) {
             name: userProvided.name,
             lastname: userProvided.lastname,
             email: userProvided.email,
-            admin: role
+            admin: role,
+            password: userProvided.hash
           }));
 
         case 3:
@@ -34,21 +35,19 @@ function createUser(userProvided) {
 }
 
 function checkUserInDB(user) {
-  var role, userToCheck;
+  var userToCheck;
   return regeneratorRuntime.async(function checkUserInDB$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
-          role = user.admin === "Admin";
           userToCheck = User.findAll({
             where: {
-              email: user.email,
-              admin: role
+              email: user.email
             }
           });
           return _context2.abrupt("return", userToCheck);
 
-        case 3:
+        case 2:
         case "end":
           return _context2.stop();
       }

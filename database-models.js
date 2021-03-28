@@ -169,7 +169,7 @@ const Contact = db.define('Contact', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    company_id: {
+    CompanyId: {
         field: "company_id",
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -180,11 +180,17 @@ const Contact = db.define('Contact', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    contact_channel: {
-        field: 'contact_channel',
+    address: {
+        field: 'address',
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    CityId:{
+        field:'cityId',
         type: DataTypes.INTEGER,
         allowNull: true,
         foreignKey: true
+
     },
     interest: {
         field: 'interest',
@@ -210,7 +216,7 @@ const ContactChannel = db.define('contact_channels', {
         type: DataTypes.INTEGER,
         allowNull: false, 
     },
-    contactChannelId: {
+    contactChannelSocialMediaId: {
         field: "contact_channel_id", 
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -221,8 +227,8 @@ const ContactChannel = db.define('contact_channels', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    preferencies_id: {
-        field: "preferencies_id", 
+    preferences_id: {
+        field: "preferences_id", 
         type: DataTypes.INTEGER,
         allowNull: true,
         foreignKey: true
@@ -243,11 +249,11 @@ const ChannelSocialMedia = db.define('contact_social_media', {
         field: "name", 
         type: DataTypes.STRING,
         allowNull: false, 
-    }, },
+    },},
     {timestamps: false
     
 });
-const Preferency = db.define('preferencies', {
+const Preference = db.define('preferences', {
     id: {
         field: "id", 
         type: DataTypes.INTEGER,
@@ -267,31 +273,41 @@ const Preferency = db.define('preferencies', {
 Region.hasMany(Country, {
   foreignKey: 'region_id'
 });
-Country.belongsTo(Region);
+// Country.belongsTo(Region);
 
 Country.hasMany(City, {
   foreignKey: 'country_id'
 });
-City.belongsTo(Country);
+// City.belongsTo(Country);
 
 City.hasMany(Company, {
-    foreignKey: 'cityId'
+    foreignKey: 'id'
   });
-Company.belongsTo(City);
+// Company.belongsTo(City);
+
+Company.hasMany(Contact, {
+    foreignKey: 'id'
+})
+// Contact.belongsTo(Company) 
 
 Contact.hasMany(ContactChannel, {
-    foreignKey: 'contactChannelId'
+    foreignKey: 'id'
   });
-ContactChannel.belongsTo(Contact);
+// ContactChannel.belongsTo(Contact);
 
 ContactChannel.hasOne(ChannelSocialMedia, {
     foreignKey: 'id'
   });
-ChannelSocialMedia.belongsTo(ContactChannel);
+// ChannelSocialMedia.belongsTo(ContactChannel);
 
-ContactChannel.hasOne(Preferency, {
+ContactChannel.hasOne(Preference, {
     foreignKey: 'id'
   });
-Preferency.belongsTo(ContactChannel);
+// Preference.belongsTo(ContactChannel);
 
-module.exports = {User, Region, Country, City, Company, Contact, ChannelSocialMedia, Preferency}
+Contact.hasOne(City,{
+    foreignKey: 'id'
+});
+// City.belongsTo(Contact)
+
+module.exports = {User, Region, Country, City, Company, Contact, ChannelSocialMedia, Preference}
