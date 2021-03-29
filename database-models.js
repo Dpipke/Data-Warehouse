@@ -243,7 +243,8 @@ const ChannelSocialMedia = db.define('contact_social_media', {
         type: DataTypes.INTEGER,
         allowNull: false, 
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
+        foreignKey: true
     },
     name: {
         field: "name", 
@@ -288,7 +289,7 @@ City.hasMany(Company, {
 Company.hasMany(Contact, {
     foreignKey: 'id'
 })
-// Contact.belongsTo(Company) 
+Contact.belongsTo(Company) 
 
 Contact.hasMany(ContactChannel, {
     foreignKey: 'id'
@@ -310,4 +311,4 @@ Contact.hasOne(City,{
 });
 // City.belongsTo(Contact)
 
-module.exports = {User, Region, Country, City, Company, Contact, ChannelSocialMedia, Preference}
+module.exports = {User, Region, Country, City, Company, Contact, ChannelSocialMedia, Preference, ContactChannel}

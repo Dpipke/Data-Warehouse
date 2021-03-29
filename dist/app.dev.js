@@ -130,11 +130,15 @@ function getRegisters(liSection, path, table, model) {
 
           if (liSection === regionSection) {
             renderRegions(results, liSection);
+          }
+
+          if (liSection === contactsSection) {
+            renderContacts(results);
           } else {
             renderTable(results, table, path, model);
           }
 
-        case 8:
+        case 9:
         case "end":
           return _context.stop();
       }
@@ -331,6 +335,54 @@ function renderRegions(results, liSection) {
   });
 }
 
+function renderContacts(results) {
+  console.log(results);
+  results.forEach(function (item) {
+    var br = document.createElement('br');
+    var fullname = item.name + " " + item.lastname + br + item.email;
+    var location = item.country + br + item.region;
+    console.log(fullname);
+    var tr = document.createElement('tr');
+    var actionsButton = document.createElement('i');
+    var editButton = document.createElement('i');
+    var deleteButton = document.createElement('i');
+    var allButtonsDiv = document.createElement('div');
+    var buttonsDiv = document.createElement('div');
+    actionsButton.alt = 'action';
+    actionsButton.classList = 'fas fa-ellipsis-v';
+    deleteButton.alt = 'delete';
+    deleteButton.classList = 'fas fa-trash';
+    editButton.alt = 'edit';
+    editButton.classList = 'fas fa-pen';
+    buttonsDiv.classList = 'dnone';
+    allButtonsDiv.classList = 'allButtons';
+    tr.id = item.id;
+    delete item.id;
+    actionsButton.addEventListener('click', function () {
+      buttonsDiv.classList.remove('dnone');
+      buttonsDiv.classList.add('buttonsDiv');
+    });
+    buttonsDiv.appendChild(editButton);
+    buttonsDiv.appendChild(deleteButton);
+    allButtonsDiv.appendChild(actionsButton);
+    allButtonsDiv.appendChild(buttonsDiv);
+    deleteButton.addEventListener('click', function () {
+      return openCompaniesOrUsersWindow('delete', item.name + " " + item.lastname, tr.id, deleteUserSection, usersSection, buttonsDiv);
+    });
+    editButton.addEventListener('click', function () {
+      return openCompaniesOrUsersWindow();
+    });
+    var registerValues = Object.values(item);
+    registerValues.forEach(function (register) {
+      var td = document.createElement('td');
+      td.innerText = register;
+      tr.appendChild(td);
+      tr.appendChild(allButtonsDiv);
+      contactsTable.appendChild(tr);
+    });
+  });
+}
+
 function renderTable(results, table, path, model) {
   results.forEach(function (item) {
     console.log(item);
@@ -456,6 +508,8 @@ function openAddButton(model, modelDependentOnId, window) {
 var userLogin = document.getElementById('userLogin');
 var passwordLogin = document.getElementById('passwordLogin');
 var loginButton = document.getElementById('loginButton');
+var loginSection = document.getElementById('loginSection');
+var incorrectData = document.getElementById('incorrectData');
 loginButton.addEventListener('click', function _callee() {
   var userLoginValue, passwordLoginValue, url, response, resultsStatus;
   return regeneratorRuntime.async(function _callee$(_context6) {
@@ -487,7 +541,15 @@ loginButton.addEventListener('click', function _callee() {
           resultsStatus = _context6.sent;
           console.log(resultsStatus);
 
-        case 10:
+          if (resultsStatus == 200) {
+            loginSection.classList.remove('fixed-window');
+            loginSection.classList.add('dnone');
+          } else {
+            incorrectData.classList.remove('dnone');
+            incorrectData.classList.add('warning');
+          }
+
+        case 11:
         case "end":
           return _context6.stop();
       }

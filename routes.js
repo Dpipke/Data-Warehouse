@@ -23,7 +23,6 @@ const {getContacts}= require('./database-ContactFunctions')
 
 app.use(bodyParser.json())
 app.use(helmet())
-// app.use(verifyToken);
 app.use(cors())
 
 const authorizationPassword = process.env.AuthPassword;
@@ -43,8 +42,38 @@ function verifyToken(req, res, next) {
 
 const limiter = rateLimit({
     windowMs: 60*60*1000,
-    max: 5
+    max: 1000
 })
+
+app.post('/login', limiter, async (req, res) =>{
+    const loginRequest ={
+        user: req.body.user,
+    }
+    const passwordRequest = req.body.password
+    const user = await getUser(loginRequest)
+    console.log(user)
+    if(user.length === 0){
+        res.status(400).send("invalid user or password")
+    }else{
+    const objectUser = user[0]
+    const objectPassword = objectUser.password
+    console.log(objectPassword)
+    console.log(passwordRequest)
+    bcrypt.compare(passwordRequest, objectPassword, async function(err, result) {
+        if (result) {
+            const userToken = jwt.sign({user}, authorizationPassword)
+            const isAdmin = jwt.verify(userToken, authorizationPassword);
+            const adminPrivilege = isAdmin.user[0].admin
+            res.status(200).json({userToken, adminPrivilege})
+        }
+        else {
+            res.status(400).send("invalid user or password")
+        }
+    });
+
+}});
+// app.use(verifyToken);
+
 
 // users 
 // admin creates users
@@ -74,7 +103,7 @@ app.post('/users',  async (req, res)=>{
             res.status(201).send('User successfully activated')
             }})})}  
         else{
-            res.status(400).send("Unexistent user. Contact Admin")
+            res.status(400).send("El usuario ya existe")
         }
 
     
@@ -126,32 +155,7 @@ app.post('/signup', checkPassword, async (req, res)=>{
     
 })
 
-app.post('/login', limiter, async (req, res) =>{
-    const loginRequest ={
-        user: req.body.user,
-    }
-    const passwordRequest = req.body.password
-    const user = await getUser(loginRequest)
-    console.log(user)
-    if(user.length === 0){
-        res.status(400).send("invalid user or password")
-    }else{
-    const objectUser = user[0]
-    const objectPassword = objectUser.password
-    console.log(objectPassword)
-    console.log(passwordRequest)
-    bcrypt.compare(passwordRequest, objectPassword, async function(err, result) {
-        if (result) {
-            const userToken = jwt.sign({user}, authorizationPassword)
-            console.log(userToken)
-            res.status(200).json(userToken)
-        }
-        else {
-            res.status(400).send("invalid user or password")
-        }
-    });
 
-}});
 
 // regions 
 app.get('/regions' , async (req, res)=>{
@@ -291,8 +295,25 @@ app.delete('/companies/:id', async (req, res)=>{
 
 app.get('/contacts', async(req, res)=>{
     const allContacts = await getContacts()
-    console.log(allContacts)
-    // res.status(200).json(allContacts)
+    // const favoriteChannels = allContacts.map(item => {
+    //     contactChannels = item.contact_channels
+    //     contactChannels.forEach(channel =>{
+    //         if(channel.preference.name == 'Favorito'){
+    //         }
+    //     })
+    // })
+
+    const mappedContacts = allContacts.map(item => {Object.assign({id: item.id, fullname: item.name + " " + item.lastname, email: item.email, location: item.country + " "+ item.region, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest}) 
+    const favoriteChannels = allContacts.map(item => {
+        contactChannels = item.contact_channels
+        contactChannels.forEach(channel =>{
+            if(channel.preference.name == 'Favorito'){
+                allContacts.favoriteChannels.push(channel.contact_social_medium.name)
+            }
+        })
+    })})
+    // console.log(mappedContacts)
+    // res.status(200).json(mappedContacts)
 })
 
 app.listen(3010, () => console.log("server started"))

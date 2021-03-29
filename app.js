@@ -106,6 +106,8 @@ async function getRegisters(liSection, path, table, model){
     const results = await response.json()
     if(liSection=== regionSection){
         renderRegions(results, liSection)
+    }if(liSection === contactsSection){
+        renderContacts(results)
     }else{
         renderTable(results, table, path, model ) 
     }
@@ -229,6 +231,51 @@ function renderRegions(results, liSection){
     })
 }
 
+function renderContacts(results){
+    console.log(results)
+    results.forEach(item =>{
+        const br = document.createElement('br')
+        const fullname = item.name + " " + item.lastname +  br + item.email
+        const location = item.country +  br + item.region
+        console.log(fullname)
+
+        const tr = document.createElement('tr')
+        const actionsButton = document.createElement('i')
+        const editButton = document.createElement('i')
+        const deleteButton = document.createElement('i')
+        const allButtonsDiv = document.createElement('div')
+        const buttonsDiv = document.createElement('div')
+        actionsButton.alt = 'action'
+        actionsButton.classList = 'fas fa-ellipsis-v'
+        deleteButton.alt = 'delete'
+        deleteButton.classList = 'fas fa-trash'
+        editButton.alt = 'edit'
+        editButton.classList = 'fas fa-pen'
+        buttonsDiv.classList = 'dnone'
+        allButtonsDiv.classList= 'allButtons'
+        tr.id = item.id
+        delete item.id
+        actionsButton.addEventListener('click', () => {
+            buttonsDiv.classList.remove('dnone')
+            buttonsDiv.classList.add('buttonsDiv')
+        })
+        buttonsDiv.appendChild(editButton)
+        buttonsDiv.appendChild(deleteButton)
+        allButtonsDiv.appendChild(actionsButton)
+        allButtonsDiv.appendChild(buttonsDiv)
+        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow('delete', item.name+" "+ item.lastname , tr.id, deleteUserSection, usersSection, buttonsDiv))
+        editButton.addEventListener('click', () => openCompaniesOrUsersWindow())
+        const registerValues = Object.values(item)
+        registerValues.forEach( register =>{
+            const td = document.createElement('td')
+            td.innerText = register   
+            tr.appendChild(td)
+            tr.appendChild(allButtonsDiv)
+            contactsTable.appendChild(tr)
+        })
+        })
+    
+}
 function renderTable(results, table, path, model){
     results.forEach(item => {
     console.log(item)
@@ -323,6 +370,8 @@ async function openAddButton(model, modelDependentOnId, window){
 const userLogin = document.getElementById('userLogin')
 const passwordLogin = document.getElementById('passwordLogin')
 const loginButton = document.getElementById('loginButton')
+const loginSection = document.getElementById('loginSection')
+const incorrectData = document.getElementById('incorrectData')
 
 loginButton.addEventListener('click',async ()=>{
     const userLoginValue = userLogin.value
@@ -338,6 +387,14 @@ loginButton.addEventListener('click',async ()=>{
     })
     const resultsStatus = await response.status
     console.log(resultsStatus)
+    if(resultsStatus == 200){
+        loginSection.classList.remove('fixed-window')
+        loginSection.classList.add('dnone')
+        
+    }else{
+        incorrectData.classList.remove('dnone')
+        incorrectData.classList.add('warning')
+    }
 
 })
 function openWindow(method, registerToDelete, buttonClickedId, section){
