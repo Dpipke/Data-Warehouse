@@ -1,5 +1,5 @@
 const {Sequelize, DataTypes} = require("sequelize")
-const {Contact, ContactChannel, ChannelSocialMedia, Preference, Company} = require('./database-models')
+const {Contact, ContactChannel, ChannelSocialMedia, Preference, Company, City, Country, Region} = require('./database-models')
 
 async function getContacts(){
     const contactsTable =  await Contact.findAll({
@@ -7,25 +7,48 @@ async function getContacts(){
             all: true,
             nested: true,
         },
-        include: {
-            model: Company
-        },
-        include:{
-            model:ContactChannel,
-            include: {
-                all: true, nested: true
-            }
-            // include:{
-            //     model: ChannelSocialMedia
-            // },
-            // include:{
-            //     model: Preference
-            // }
-        }
+        // include:{
+        //     model:City,  
+        //     include: {
+        //         all: true, nested: true, required: true
+        //         // model: Country,
+        //         // nested: true,
+        //         // include: {
+        //         //     model: Region,
+        //         //     nested: true,
+        //         // }
+        //     }
+        // },        
+        // include: {
+        //     model: Company,
+        //     nested: true
+        // },
+        // include:{
+        //     model:ContactChannel,
+        //     include: {
+        //         all: true, nested: true
+        //     }
+        // }
     },
         );
     // const allContacts = JSON.stringify(contactsTable)
     // console.log(allContacts)
     return contactsTable
 }
-module.exports = {getContacts}
+
+async function getContactChannels(){
+    const contactChannelsArray = await ChannelSocialMedia.findAll();
+    return contactChannelsArray
+}
+async function getContactPreferences(){
+    const contactPreferenceArray = await Preference.findAll();
+    return contactPreferenceArray
+}
+async function deleteContact(id){
+    const contactToDelete =  await Contact.destroy({
+        where: {
+        id: id
+        }
+    })
+}
+module.exports = {getContacts, getContactChannels, getContactPreferences, deleteContact}

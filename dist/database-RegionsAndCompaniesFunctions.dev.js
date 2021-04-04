@@ -22,7 +22,7 @@ function getAllRegisters(model, id) {
       switch (_context.prev = _context.next) {
         case 0:
           _context.t0 = model;
-          _context.next = _context.t0 === 'Region' ? 3 : _context.t0 === 'Country' ? 14 : _context.t0 === 'City' ? 19 : _context.t0 === 'Company' ? 24 : _context.t0 === 'User' ? 30 : 34;
+          _context.next = _context.t0 === 'Region' ? 3 : _context.t0 === 'Country' ? 14 : _context.t0 === 'City' ? 19 : _context.t0 === 'Company' ? 24 : _context.t0 === 'User' ? 29 : 33;
           break;
 
         case 3:
@@ -70,30 +70,35 @@ function getAllRegisters(model, id) {
         case 24:
           _context.next = 26;
           return regeneratorRuntime.awrap(Company.findAll({
-            attributes: ['id', 'name', 'address', 'email', 'telephone', 'cityId'],
-            foreignKey: 'city',
+            // attributes: ['id','name', 'address', 'email', 'telephone','cityId'],
+            // foreignKey: 'city',
             include: {
-              all: true,
-              nested: true,
-              required: true
+              model: City,
+              include: {
+                model: Country,
+                include: {
+                  model: Region
+                }
+              } // all: true,
+              // nested: true,
+              // required: true
+
             }
           }));
 
         case 26:
           companiesTable = _context.sent;
-          // const allCompanies = JSON.stringify(companiesTable)
-          console.log(companiesTable);
           return _context.abrupt("return", companiesTable);
 
-        case 30:
-          _context.next = 32;
+        case 29:
+          _context.next = 31;
           return regeneratorRuntime.awrap(User.findAll());
 
-        case 32:
+        case 31:
           usersTable = _context.sent;
           return _context.abrupt("return", usersTable);
 
-        case 34:
+        case 33:
         case "end":
           return _context.stop();
       }

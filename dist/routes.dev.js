@@ -30,7 +30,10 @@ var _require2 = require('./database-RegionsAndCompaniesFunctions'),
     deleteRegister = _require2.deleteRegister;
 
 var _require3 = require('./database-ContactFunctions'),
-    getContacts = _require3.getContacts;
+    getContacts = _require3.getContacts,
+    getContactChannels = _require3.getContactChannels,
+    getContactPreferences = _require3.getContactPreferences,
+    deleteContact = _require3.deleteContact;
 
 app.use(bodyParser.json());
 app.use(helmet());
@@ -38,7 +41,6 @@ app.use(cors());
 var authorizationPassword = process.env.AuthPassword;
 
 function verifyToken(req, res, next) {
-  console.log(req.headers.authorization);
   var token = req.headers.authorization.split(' ')[1];
   console.log(token);
 
@@ -113,8 +115,8 @@ app.post('/login', limiter, function _callee2(req, res) {
       }
     }
   });
-}); // app.use(verifyToken);
-// users 
+});
+app.use(verifyToken); // users 
 // admin creates users
 
 app.get('/users', function _callee3(req, res) {
@@ -673,7 +675,7 @@ app["delete"]('/companies/:id', function _callee25(req, res) {
   });
 });
 app.get('/contacts', function _callee26(req, res) {
-  var allContacts, mappedContacts;
+  var allContacts, contacts, mappedContacts;
   return regeneratorRuntime.async(function _callee26$(_context26) {
     while (1) {
       switch (_context26.prev = _context26.next) {
@@ -683,38 +685,119 @@ app.get('/contacts', function _callee26(req, res) {
 
         case 2:
           allContacts = _context26.sent;
-          // const favoriteChannels = allContacts.map(item => {
-          //     contactChannels = item.contact_channels
-          //     contactChannels.forEach(channel =>{
-          //         if(channel.preference.name == 'Favorito'){
-          //         }
-          //     })
-          // })
-          mappedContacts = allContacts.map(function (item) {
-            Object.assign({
+          contacts = [];
+          mappedContacts = allContacts.forEach(function (item) {
+            var eachContact = Object.assign({
               id: item.id,
               fullname: item.name + " " + item.lastname,
               email: item.email,
-              location: item.country + " " + item.region,
+              country: item.City.Country.name,
+              region: item.City.Country.Region.name,
               company: item.Company.name,
               position: item.position,
               favoriteChannels: [],
               interest: item.interest
             });
-            var favoriteChannels = allContacts.map(function (item) {
-              contactChannels = item.contact_channels;
-              contactChannels.forEach(function (channel) {
-                if (channel.preference.name == 'Favorito') {
-                  allContacts.favoriteChannels.push(channel.contact_social_medium.name);
-                }
-              });
+            var favoriteChannels = allContacts.map(function (element) {
+              if (item.id == element.id) {
+                var contactChannels = element.contact_channels;
+                contactChannels.forEach(function (channel) {
+                  if (channel.preference.name == 'Favorito') {
+                    eachContact.favoriteChannels.push(channel.contact_social_medium.name);
+                    contacts.push(eachContact);
+                  }
+                });
+              } else {
+                contacts.push(eachContact);
+              }
             });
-          }); // console.log(mappedContacts)
-          // res.status(200).json(mappedContacts)
+          });
+          res.status(200).json(contacts);
+
+        case 6:
+        case "end":
+          return _context26.stop();
+      }
+    }
+  });
+});
+app.post('/contacts', function _callee27(req, res) {
+  return regeneratorRuntime.async(function _callee27$(_context27) {
+    while (1) {
+      switch (_context27.prev = _context27.next) {
+        case 0:
+        case "end":
+          return _context27.stop();
+      }
+    }
+  });
+});
+app["delete"]('/contacts/:id', function _callee28(req, res) {
+  var contactId;
+  return regeneratorRuntime.async(function _callee28$(_context28) {
+    while (1) {
+      switch (_context28.prev = _context28.next) {
+        case 0:
+          contactId = req.params.id;
+          deleteContact(contactId);
+
+        case 2:
+        case "end":
+          return _context28.stop();
+      }
+    }
+  });
+});
+app.get('/contacts/search/:name?/:position?/:location?/:company?', function _callee29(req, res) {
+  return regeneratorRuntime.async(function _callee29$(_context29) {
+    while (1) {
+      switch (_context29.prev = _context29.next) {
+        case 0:
+          console.log(req.params.name);
+
+        case 1:
+        case "end":
+          return _context29.stop();
+      }
+    }
+  });
+});
+app.get('/contactchannels', function _callee30(req, res) {
+  var allContactChannels;
+  return regeneratorRuntime.async(function _callee30$(_context30) {
+    while (1) {
+      switch (_context30.prev = _context30.next) {
+        case 0:
+          _context30.next = 2;
+          return regeneratorRuntime.awrap(getContactChannels());
+
+        case 2:
+          allContactChannels = _context30.sent;
+          res.status(200).json(allContactChannels);
 
         case 4:
         case "end":
-          return _context26.stop();
+          return _context30.stop();
+      }
+    }
+  });
+});
+app.get('/preferences', function _callee31(req, res) {
+  var allContactPreferences;
+  return regeneratorRuntime.async(function _callee31$(_context31) {
+    while (1) {
+      switch (_context31.prev = _context31.next) {
+        case 0:
+          _context31.next = 2;
+          return regeneratorRuntime.awrap(getContactPreferences());
+
+        case 2:
+          allContactPreferences = _context31.sent;
+          res.status(200).json(allContactPreferences);
+
+        case 4:
+        case "end":
+          return _context31.stop();
       }
     }
   });
@@ -724,9 +807,9 @@ app.listen(3010, function () {
 });
 
 function checkPassword(req, res, next) {
-  return regeneratorRuntime.async(function checkPassword$(_context27) {
+  return regeneratorRuntime.async(function checkPassword$(_context32) {
     while (1) {
-      switch (_context27.prev = _context27.next) {
+      switch (_context32.prev = _context32.next) {
         case 0:
           if (req.body.password === req.body.repeatPassword) {
             next();
@@ -736,7 +819,7 @@ function checkPassword(req, res, next) {
 
         case 1:
         case "end":
-          return _context27.stop();
+          return _context32.stop();
       }
     }
   });

@@ -30,16 +30,24 @@ async function getAllRegisters(model, id){
         break;
         case 'Company': 
             const companiesTable = await Company.findAll({
-                attributes: ['id','name', 'address', 'email', 'telephone','cityId'],
-                foreignKey: 'city',
+                // attributes: ['id','name', 'address', 'email', 'telephone','cityId'],
+                // foreignKey: 'city',
                 include: {
-                    all: true,
-                    nested: true,
-                    required: true}
+                    model: City,
+                    include:{
+                        model: Country,
+                        include:{
+                            model: Region
+                        }
+                    }
+                    // all: true,
+                    // nested: true,
+                    // required: true
+                }
                 },
                 );
                 // const allCompanies = JSON.stringify(companiesTable)
-                console.log(companiesTable)
+                // console.log(allCompanies)
                 return companiesTable
         break;
         case 'User': 

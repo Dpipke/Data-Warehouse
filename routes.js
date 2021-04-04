@@ -18,7 +18,11 @@ const {getAllRegisters,
         updateRegister,
         deleteRegister
     } = require('./database-RegionsAndCompaniesFunctions');
-const {getContacts}= require('./database-ContactFunctions')
+const {getContacts,
+    getContactChannels,
+    getContactPreferences,
+    deleteContact
+    }= require('./database-ContactFunctions')
 
 
 app.use(bodyParser.json())
@@ -28,7 +32,6 @@ app.use(cors())
 const authorizationPassword = process.env.AuthPassword;
 
 function verifyToken(req, res, next) {
-    console.log(req.headers.authorization);
     const token = req.headers.authorization.split(' ')[1];
     console.log(token)
     try {
@@ -72,7 +75,7 @@ app.post('/login', limiter, async (req, res) =>{
     });
 
 }});
-// app.use(verifyToken);
+app.use(verifyToken);
 
 
 // users 
@@ -295,25 +298,45 @@ app.delete('/companies/:id', async (req, res)=>{
 
 app.get('/contacts', async(req, res)=>{
     const allContacts = await getContacts()
-    // const favoriteChannels = allContacts.map(item => {
-    //     contactChannels = item.contact_channels
-    //     contactChannels.forEach(channel =>{
-    //         if(channel.preference.name == 'Favorito'){
-    //         }
-    //     })
-    // })
+    const contacts = []
+    const mappedContacts = allContacts.forEach(item => {
+        const eachContact = Object.assign({id: item.id, fullname: item.name + " " + item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest})
+        const favoriteChannels = allContacts.map(element => {
+            if(item.id == element.id){
+            const contactChannels = element.contact_channels
+            contactChannels.forEach(channel =>{
+                if(channel.preference.name == 'Favorito'){
+                    eachContact.favoriteChannels.push(channel.contact_social_medium.name)
+                    contacts.push(eachContact)
 
-    const mappedContacts = allContacts.map(item => {Object.assign({id: item.id, fullname: item.name + " " + item.lastname, email: item.email, location: item.country + " "+ item.region, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest}) 
-    const favoriteChannels = allContacts.map(item => {
-        contactChannels = item.contact_channels
-        contactChannels.forEach(channel =>{
-            if(channel.preference.name == 'Favorito'){
-                allContacts.favoriteChannels.push(channel.contact_social_medium.name)
-            }
-        })
-    })})
-    // console.log(mappedContacts)
-    // res.status(200).json(mappedContacts)
+                }
+            })
+            }else{
+                contacts.push(eachContact)
+            }})})
+    res.status(200).json(contacts)
+})
+
+app.post('/contacts', async(req, res)=>{
+    
+})
+
+app.delete('/contacts/:id', async(req, res)=>{
+    const contactId = req.params.id
+    deleteContact(contactId)
+})
+
+app.get('/contacts/search/:name?/:position?/:location?/:company?', async(req, res)=>{
+    console.log(req.params.name)
+})
+
+app.get('/contactchannels', async(req, res)=>{
+    const allContactChannels = await getContactChannels()
+    res.status(200).json(allContactChannels)
+})
+app.get('/preferences', async(req, res)=>{
+    const allContactPreferences = await getContactPreferences()
+    res.status(200).json(allContactPreferences)
 })
 
 app.listen(3010, () => console.log("server started"))

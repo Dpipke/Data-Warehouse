@@ -9,6 +9,10 @@ const contactsSection = document.getElementById('contacts-section')
 const usersTable = document.getElementById('users-table')
 const companyTable = document.getElementById('company-table')
 const contactsTable = document.getElementById('contacts-table')
+const deleteContactSection = document.getElementById('delete-contact')
+const deleteContactButton = document.getElementById('deleteContactButton')
+
+const TOKEN = sessionStorage.getItem('userToken');
 
 const updateLocationSection = document.getElementById('update-location')
 const deleteLocationSection = document.getElementById('delete-location')
@@ -36,25 +40,63 @@ const cancelAddCompany = document.getElementById('cancelAddCompany')
 const postCompanyRegion = document.getElementById('postCompanyRegion')
 const postCompanyCountry = document.getElementById('postCompanyCountry')
 const postCompanyCity = document.getElementById('postCompanyCity')
+const addContactButton = document.getElementById('addContactButton')
+const addContact = document.getElementById('addContact')
+const addContactWindow = document.getElementById('addContactWindow')
+const postContactRegion = document.getElementById('postContactRegion')
+const postContactCountry = document.getElementById('postContactCountry')
+const postContactCity = document.getElementById('postContactCity')
+const postContactChannel = document.getElementById('postContactChannel')
+const postContactPreference = document.getElementById('postContactPreference')
 
 const inputCompanyName = document.getElementById('inputCompanyName')
 const inputCompanyAddress = document.getElementById('inputCompanyAddress')
 const inputCompanyEmail = document.getElementById('inputCompanyEmail')
 const inputCompanyTelephone = document.getElementById('inputCompanyTelephone')
 
+const inputContactName = document.getElementById('inputContactName')
+const inputContactLastname = document.getElementById('inputContactLastname')
+const inputContactPosition = document.getElementById('inputPosition')
+const inputContactEmail = document.getElementById('inputContactEmail')
+const inputContactCity = document.getElementById('inputContactCity')
+const inputContactAddress = document.getElementById('inputContactAddress')
+
 const arrowDownSearch = document.getElementById('arrowDownSearch')
 const searchOptions = document.getElementById('searchOptions')
+
+const inputContactNameToSearch = document.getElementById('inputContactNameToSearch')
+const inputContactPositionToSearch = document.getElementById('inputContactPositionToSearch')
+const inputContactLocationToSearch = document.getElementById('inputContactLocationToSearch')
+const inputContactCompanyToSearch = document.getElementById('inputContactCompanyToSearch')
+
 arrowDownSearch.addEventListener('click', ()=> {
     searchOptions.classList.remove('dnone')
     searchOptions.classList.add('searchOptions')
+    assignRegionToForm(inputContactLocationToSearch)
+    assignCompaniesToForm(inputContactCompanyToSearch)
 } )
-const inputContactName = document.getElementById('inputContactName')
-const inputContactPosition = document.getElementById('inputContactPosition')
-const inputContactLocation = document.getElementById('inputContactLocation')
-const inputContactCompany = document.getElementById('inputContactCompany')
-const searchLens = document.getElementById('searchLens')
-// searchLens.addEventListener('submit', )
 
+const searchLens = document.getElementById('searchLens')
+searchLens.addEventListener('click', async ()=>{
+    const body = {
+        name: inputContactNameToSearch.value,
+        position: inputContactPositionToSearch.value,
+        location: inputContactLocationToSearch.options[inputContactLocationToSearch.selectedIndex].value,
+        company: inputContactCompanyToSearch.options[inputContactCompanyToSearch.selectedIndex].value
+    }
+    const url = `http://localhost:3010/contacts/search?name:${body.name}?position:${body.position}?location${body.location}?company:${body.company}`
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + TOKEN,
+        body: JSON.stringify({body})
+      },
+    })
+    const results = await response.json()
+
+} )
+
+addContactButton.addEventListener('click',()=>openAddButton('contacts', null,addContactWindow ) )
 addCompanyButton.addEventListener('click', ()=>openAddButton('companies', null,addCompanyWindow ))
 cancelAddCompany.addEventListener('click', ()=> closeWindow(addCompanyWindow, regionSection))
 addCompanyToDBButton.addEventListener('click', ()=>addNewRegister(
@@ -102,7 +144,12 @@ function openLi(model, liSection, path, table){
 }
 async function getRegisters(liSection, path, table, model){
     const url = `http://localhost:3010/${path}`
-    const response = await fetch(url)
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + TOKEN,
+      },
+    })
     const results = await response.json()
     if(liSection=== regionSection){
         renderRegions(results, liSection)
@@ -118,7 +165,9 @@ async function addNewRegister(path,  body, window, mainSection, successWindow, c
     const response = await fetch(url,{
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + TOKEN,
+
         },
         method: "POST",
         body: JSON.stringify({body})
@@ -142,6 +191,9 @@ async function deleteRegister(path, id){
     const url = `http://localhost:3010/${path}/${id}`
     const response = await fetch(url, {
         method: "DELETE",
+        headers: {
+            Authorization: 'Bearer ' + TOKEN,
+        }
     })
 
 }
@@ -151,7 +203,9 @@ async function updateRegister(updatedInformation, path, id){
     const response = await fetch(url,{
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + TOKEN,
+
         },
         method: "PUT",
         body: JSON.stringify({name: updatedInformation})
@@ -232,13 +286,7 @@ function renderRegions(results, liSection){
 }
 
 function renderContacts(results){
-    console.log(results)
     results.forEach(item =>{
-        const br = document.createElement('br')
-        const fullname = item.name + " " + item.lastname +  br + item.email
-        const location = item.country +  br + item.region
-        console.log(fullname)
-
         const tr = document.createElement('tr')
         const actionsButton = document.createElement('i')
         const editButton = document.createElement('i')
@@ -263,16 +311,37 @@ function renderContacts(results){
         buttonsDiv.appendChild(deleteButton)
         allButtonsDiv.appendChild(actionsButton)
         allButtonsDiv.appendChild(buttonsDiv)
-        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow('delete', item.name+" "+ item.lastname , tr.id, deleteUserSection, usersSection, buttonsDiv))
+        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name+" "+ item.lastname , tr.id, deleteContactSection, contactsSection, buttonsDiv))
         editButton.addEventListener('click', () => openCompaniesOrUsersWindow())
         const registerValues = Object.values(item)
-        registerValues.forEach( register =>{
-            const td = document.createElement('td')
-            td.innerText = register   
-            tr.appendChild(td)
-            tr.appendChild(allButtonsDiv)
-            contactsTable.appendChild(tr)
-        })
+        const tdNameAndEmail = document.createElement('td')
+        const tdLocation = document.createElement('td')
+        const tdCompany = document.createElement('td')
+        const tdPosition = document.createElement('td')
+        const tdFavoriteChannel = document.createElement('td')
+        const tdInterest = document.createElement('td')
+        tdNameAndEmail.innerHTML = item.fullname + '<br>'+ item.email
+        tdLocation.innerText = item.country + " "+item.region
+        tdCompany.innerText = item.company
+        tdPosition.innerText = item.position
+        tdFavoriteChannel.innerText = item.favoriteChannels
+        tdInterest.innerHTML = `<progress max = 100>${item.interest}</progress>`
+        tdInterest.value = item.interest
+        tr.appendChild(tdNameAndEmail)
+        tr.appendChild(tdLocation)
+        tr.appendChild(tdCompany)
+        tr.appendChild(tdPosition)
+        tr.appendChild(tdFavoriteChannel)
+        tr.appendChild(tdInterest)
+        tr.appendChild(allButtonsDiv)
+        contactsTable.appendChild(tr)
+        // registerValues.forEach( register =>{
+        //     const td = document.createElement('td')
+        //     td.innerText = register   
+        //     tr.appendChild(td)
+        //     tr.appendChild(allButtonsDiv)
+        //     contactsTable.appendChild(tr)
+        // })
         })
     
 }
@@ -303,7 +372,7 @@ function renderTable(results, table, path, model){
     buttonsDiv.appendChild(deleteButton)
     allButtonsDiv.appendChild(actionsButton)
     allButtonsDiv.appendChild(buttonsDiv)
-    deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow('delete', item.name+" "+ item.lastname , tr.id, deleteUserSection, usersSection, buttonsDiv))
+    deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.fullname , tr.id, deleteUserSection, usersSection, buttonsDiv))
     editButton.addEventListener('click', () => openCompaniesOrUsersWindow())
     const registerValues = Object.values(item)
     registerValues.forEach( register =>{
@@ -347,6 +416,22 @@ async function openAddButton(model, modelDependentOnId, window){
         addLocationButton.addEventListener('click', ()=> addNewRegister('regions', {
             name: newLocation.value
         }))
+        if(window == addContactWindow){
+            console.log('si')
+            assignRegionToForm(postContactRegion)
+            changeCountry(postContactRegion, postContactCountry, postContactCity)
+            assignContactChannelsToForm()
+            assignContactPreferencesToForm()
+            addContact.addEventListener('click', ()=> addNewRegister('contacts', {
+                name: inputContactName.value,
+                lastname: inputContactLastname.value,
+                position: inputContactPosition.value,
+                email: inputContactEmail.value,
+                cityId: inputContactCity.value,
+                address: inputContactAddress.value,
+
+            }))
+        }
         if(postUserPassword.value==postUserRepeatPassword.value){
         addUserButton.addEventListener('click', () => {
             const userBody = {
@@ -358,9 +443,10 @@ async function openAddButton(model, modelDependentOnId, window){
             }
             addNewRegister('users', userBody, addUserWindow, usersSection, closeAddUserWindow, closeAddUser)})
            if(window == addCompanyWindow){
-                assignRegionToForm()
-                changeCountry()
+                assignRegionToForm(postCompanyRegion)
+                changeCountry(postCompanyRegion, postCompanyCountry, postCompanyCity)
         addCompanyButton.addEventListener('click', () => {})
+
     }else{
         invalidPassword.classList.remove('dnone')
         invalidPassword.classList.add('warning')
@@ -372,6 +458,7 @@ const passwordLogin = document.getElementById('passwordLogin')
 const loginButton = document.getElementById('loginButton')
 const loginSection = document.getElementById('loginSection')
 const incorrectData = document.getElementById('incorrectData')
+const nav = document.getElementById('nav')
 
 loginButton.addEventListener('click',async ()=>{
     const userLoginValue = userLogin.value
@@ -380,13 +467,16 @@ loginButton.addEventListener('click',async ()=>{
     const response = await fetch(url,{
         headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + TOKEN,
+
         },
         method: "POST",
         body: JSON.stringify({user: userLoginValue, password: passwordLoginValue})
-    })
+    }).then(response => permiso(response)).then(response => response.json()).then(response => sessionLogin(response))
+
+async function permiso(response){
     const resultsStatus = await response.status
-    console.log(resultsStatus)
     if(resultsStatus == 200){
         loginSection.classList.remove('fixed-window')
         loginSection.classList.add('dnone')
@@ -395,6 +485,23 @@ loginButton.addEventListener('click',async ()=>{
         incorrectData.classList.remove('dnone')
         incorrectData.classList.add('warning')
     }
+    return response
+}
+async function sessionLogin(response){
+    console.log(response)
+    sessionStorage.setItem('userToken', response.userToken)
+    // const myHeaders = new Headers()
+    // myHeaders.append('authorization', `Bearer ${response.userToken}`);
+
+    if(response.adminPrivilege == true){
+        nav.classList.remove('dnone')
+        nav.classList.add('ul-nav')
+    }else{
+        nav.classList.remove('dnone')
+        nav.classList.add('ul-nav')
+        usersLi.classList.add('dnone')
+    }
+}
 
 })
 function openWindow(method, registerToDelete, buttonClickedId, section){
@@ -434,7 +541,7 @@ function openWindow(method, registerToDelete, buttonClickedId, section){
 }
 
 
-function openCompaniesOrUsersWindow(db, method, registerToDelete, buttonClickedId, window, section, buttonsDiv){
+function openCompaniesOrUsersWindow(registerToDelete, buttonClickedId, window, section, buttonsDiv){
     window.classList.remove('dnone')
     window.classList.add('fixed-window')
     buttonsDiv.classList = ""
@@ -443,7 +550,12 @@ function openCompaniesOrUsersWindow(db, method, registerToDelete, buttonClickedI
     deleteUserButton.addEventListener('click', () => {
         deleteRegister('users', buttonClickedId),
         closeWindow(window, section)
-})}
+    })
+    deleteContactButton.addEventListener('click', ()=>{
+        deleteRegister('contacts', buttonClickedId),
+        closeWindow(window, section)
+    })
+}
 
 function closeWindow(window, mainSection){
     window.className = ""
@@ -454,37 +566,107 @@ function closeWindow(window, mainSection){
 
 async function getLocations(){
     const url = `http://localhost:3010/regions`
-    const response = await fetch(url)
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + TOKEN
+        }})
     const results = await response.json()
     return results
 }
-async function assignRegionToForm(){
+async function getContactChannels(){
+    const url = `http://localhost:3010/contactchannels`
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + TOKEN
+        }})
+    const results = await response.json()
+    return results
+}
+async function getContactPreferences(){
+    const url = `http://localhost:3010/preferences`
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + TOKEN
+        }})
+    const results = await response.json()
+    return results
+}
+async function assignRegionToForm(postRegion){
     const allLocations = await getLocations()
     allLocations.forEach( region =>{
         const option = document.createElement('option')
         option.innerText = region.regionName
         option.id = region.regionId
         option.value = region.regionId
-        postCompanyRegion.appendChild(option)
+        postRegion.appendChild(option)
 })
 }
-
-async function changeCountry(){
-    postCompanyRegion.addEventListener('change', async (event)=>{
-        const chosenRegionId = postCompanyRegion.options[postCompanyRegion.selectedIndex].value
+async function assignContactChannelsToForm(){
+    const allContactChannels = await getContactChannels()
+    console.log(allContactChannels)
+    allContactChannels.forEach( contact =>{
+        const option = document.createElement('option')
+        option.innerText = contact.name
+        option.id = contact.id
+        option.value = contact.id
+        postContactChannel.appendChild(option)
+})
+}
+async function assignContactPreferencesToForm(){
+    const allContactPreferences = await getContactPreferences()
+    console.log(allContactPreferences)
+    allContactPreferences.forEach( contact =>{
+        const option = document.createElement('option')
+        option.innerText = contact.name
+        option.id = contact.id
+        option.value = contact.id
+        postContactPreference.appendChild(option)
+})
+}
+async function assignCompaniesToForm(selectCompany){
+    const url = `http://localhost:3010/companies`
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+        Authorization: 'Bearer ' + TOKEN,
+      },
+    })
+    const results = await response.json()
+    results.forEach( company =>{
+        const option = document.createElement('option')
+        option.innerText = company.name
+        option.id = company.id
+        option.value = company.id
+        selectCompany.appendChild(option)
+})
+}
+async function changeCountry(postRegion, postCountry, postCity){
+    postRegion.addEventListener('change', async (event)=>{
+        const chosenRegionId = postRegion.options[postRegion.selectedIndex].value
         const url = `http://localhost:3010/countries/${chosenRegionId}`
-        const response = await fetch(url)
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+            Authorization: 'Bearer ' + TOKEN
+            }})
         const results = await response.json()
         results.forEach( country =>{
             const option = document.createElement('option')
             option.innerText = country.countryName
             option.id = country.countryId
             option.value = country.countryId
-            postCompanyCountry.appendChild(option)
-            postCompanyCountry.addEventListener('change', async (event)=>{
-                const chosenCountryId = postCompanyCountry.options[postCompanyCountry.selectedIndex].value
+            postCountry.appendChild(option)
+            postCountry.addEventListener('change', async (event)=>{
+                const chosenCountryId = postCountry.options[postCountry.selectedIndex].value
                 const cityUrl = `http://localhost:3010/cities/${chosenCountryId}`
-                const cityResponse = await fetch(cityUrl)
+                const cityResponse = await fetch(cityUrl, {
+                    method: 'GET',
+                    headers: {
+                    Authorization: 'Bearer ' + TOKEN
+                    }})
                 const cityResults = await cityResponse.json()
                 console.log(cityResults)
                 cityResults.forEach(city =>{
@@ -492,7 +674,7 @@ async function changeCountry(){
                     option.innerText = city.cityName
                     option.id = city.cityId
                     option.value = city.cityId
-                    postCompanyCity.appendChild(option)
+                    postCity.appendChild(option)
                 })
             })
 })})}

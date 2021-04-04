@@ -11,8 +11,8 @@
     <header>
         <img src="" alt="LOGO">
         <nav>
-            <ul class="ul-nav">
-                <li id="contacts-li">Contactos</li>
+            <ul class="dnone" id="nav">
+                <li><a id="contacts-li">Contactos</a></li>
                 <li><a id="users-li">Usuarios</a></li>
                 <li><a id="company-li">Compañía</a></li>
                 <li><a id="region-li"> Región/Ciudad</a></li>
@@ -36,19 +36,23 @@
                 </div>
                 <div class="dnone" id="searchOptions">
                     <p>Nombre del Cargo</p>
-                    <input type="text" id="inputContactName">
+                    <input type="text" id="inputContactNameToSearch">
                     <p>Cargo</p>
-                    <input type="text" id="inputContactPosition">
+                    <input type="text" id="inputContactPositionToSearch">
                     <p>País/Region</p>
-                    <select name="" id="inputContactLocation"></select>
+                    <select name="" id="inputContactLocationToSearch">
+                        <option value="">Seleccione...</option>
+                    </select>
                     <p>Compañía</p>
-                    <select name="" id="inputContactCompany"></select>
+                    <select name="" id="inputContactCompanyToSearch">
+                        <option value="">Seleccione...</option>
+                    </select>
                 </div>
                 <i class="fas fa-search" id="searchLens"></i>
                 <div>
                     <i class="fas fa-download"></i>
                     <i class="fas fa-sort-down">Exportar contactos</i>
-                    <p>Agregar contacto</p>
+                    <p id="addContactButton">Agregar contacto</p>
                 </div>
             </div>
             <table id="contacts-table">
@@ -60,6 +64,93 @@
                 <th>Interés</th>
                 <th>Acciones</th>
             </table>
+            <div class="dnone" id="addContactWindow">
+                <div class="header-section headerCompany">
+                    <h2>Nuevo Contacto</h2>
+                </div>
+                <form action="post" class="addContactForm">
+                    <fieldset class="registerFieldset">
+                        <label for="name">
+                            <p>Nombre</p>
+                            <input type="text" name="name" id="inputContactName">
+                        </label>
+                        <label for="lastname">
+                            <p>Apellido</p>
+                            <input type="text" name="lastname" id="inputContactLastname">
+                        </label>
+                        <label for="position">
+                            <p>Cargo</p>
+                            <input type="text" name="position" id="inputContactPosition">
+                        </label>
+                        <label for="email">
+                            <p>Email</p>
+                            <input type="text" name="email" id="inputContactEmail">
+                        </label>
+                        <label for="company">
+                            <p>Compañía</p>
+                            <input type="text" name="company" id="inputContactCompany">
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="region">
+                            <p>Región</p>
+                            <select name="region" required id="postContactRegion">
+                                <option value="-">Seleccione...</option>
+                            </select>                        
+                        </label>
+                        <label for="country">
+                            <p>País</p>
+                            <select name="country" required id="postContactCountry">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </label>
+                        <label for="city">
+                            <p>Ciudad</p>
+                            <select name="city" required id="postContactCity">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </label>
+                        <label for="address">
+                            <p>Dirección</p>
+                            <input type="text" name="address" id="inputContactAddress">
+                        </label>
+                        <label for="interest">
+                            <p>Interés</p>
+                            <progress max="100"></progress>
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="contactChannel">
+                            <p>Canal de contacto</p>
+                            <select name="contactChannel" required id="postContactChannel">
+                                <option value="-"></option>
+                            </select>                        
+                        </label>
+                        <label for="userAccount">
+                            <p>Cuenta de Usuario</p>
+                            <input type="text" name="userAccount" id="inputContactAddress">
+                        </label>
+                        <label for="contactPreference">
+                            <p>Preferencias</p>
+                            <select name="contactPreference" required id="postContactPreference">
+                                <option value="-"></option>
+                            </select>                        
+                        </label>
+                    </fieldset>
+                </form>
+                <div class="buttons">
+                    <p class="locations-buttons cancelAddRegister" id="cancelAddCompany">Cancelar</p>
+                    <p class="locations-buttons addRegisterButton" id="addContact">Agregar Contacto</p>
+                </div>
+            </div>
+            <div class="dnone" id="delete-contact">
+                <div class="header-section"></div>
+                <p>¿Esta seguro que desea eliminar </p><p id=""></p>
+                <div class="deleteButtons">
+                    <p class="locations-buttons cancelDeleteRegister" id="cancelDeleteUser">Cancelar</p>
+                    <p class="locations-buttons confirmDeleteRegister" id="deleteContactButton">Eliminar</p>    
+                </div>
+            </div>
         </section>
         <section class='dnone' id="region-section">
             <div class='dnone' id="add-location">

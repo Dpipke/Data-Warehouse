@@ -274,17 +274,17 @@ const Preference = db.define('preferences', {
 Region.hasMany(Country, {
   foreignKey: 'region_id'
 });
-// Country.belongsTo(Region);
+Country.belongsTo(Region);
 
 Country.hasMany(City, {
   foreignKey: 'country_id'
 });
-// City.belongsTo(Country);
+City.belongsTo(Country);
 
 City.hasMany(Company, {
     foreignKey: 'id'
   });
-// Company.belongsTo(City);
+Company.belongsTo(City);
 
 Company.hasMany(Contact, {
     foreignKey: 'id'
