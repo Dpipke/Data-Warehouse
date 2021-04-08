@@ -21,7 +21,8 @@ const {getAllRegisters,
 const {getContacts,
     getContactChannels,
     getContactPreferences,
-    deleteContact
+    deleteContact,
+    searchContacts
     }= require('./database-ContactFunctions')
 
 
@@ -300,7 +301,7 @@ app.get('/contacts', async(req, res)=>{
     const allContacts = await getContacts()
     const contacts = []
     const mappedContacts = allContacts.forEach(item => {
-        const eachContact = Object.assign({id: item.id, fullname: item.name + " " + item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest})
+        const eachContact = Object.assign({id: item.id, name: item.name, lastname: item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest})
         const favoriteChannels = allContacts.map(element => {
             if(item.id == element.id){
             const contactChannels = element.contact_channels
@@ -326,8 +327,26 @@ app.delete('/contacts/:id', async(req, res)=>{
     deleteContact(contactId)
 })
 
-app.get('/contacts/search/:name?/:position?/:location?/:company?', async(req, res)=>{
-    console.log(req.params.name)
+app.get('/contacts/search', async(req, res)=>{
+    const filters= req.headers.body
+    const contacts = await searchContacts(filters)
+    const contactsObtained = []
+    const mappedContacts = contacts.forEach(item => {
+        const eachContact = Object.assign({id: item.id, name: item.name, lastname: item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest})
+        const favoriteChannels = contacts.map(element => {
+            if(item.id == element.id){
+            const contactChannels = element.contact_channels
+            contactChannels.forEach(channel =>{
+                if(channel.preference.name == 'Favorito'){
+                    eachContact.favoriteChannels.push(channel.contact_social_medium.name)
+                    contactsObtained.push(eachContact)
+
+                }
+            })
+            }else{
+                contactsObtained.push(eachContact)
+            }})})
+    res.status(200).json(contactsObtained)
 })
 
 app.get('/contactchannels', async(req, res)=>{

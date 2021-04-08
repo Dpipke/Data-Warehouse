@@ -60,58 +60,67 @@ var inputCompanyName = document.getElementById('inputCompanyName');
 var inputCompanyAddress = document.getElementById('inputCompanyAddress');
 var inputCompanyEmail = document.getElementById('inputCompanyEmail');
 var inputCompanyTelephone = document.getElementById('inputCompanyTelephone');
+var inputSelectedInterest = document.getElementById('inputSelectedInterest');
+var progressInterest = document.getElementById('progressInterest');
 var inputContactName = document.getElementById('inputContactName');
 var inputContactLastname = document.getElementById('inputContactLastname');
-var inputContactPosition = document.getElementById('inputPosition');
+var inputContactPosition = document.getElementById('inputContactPosition');
 var inputContactEmail = document.getElementById('inputContactEmail');
 var inputContactCity = document.getElementById('inputContactCity');
 var inputContactAddress = document.getElementById('inputContactAddress');
+var inputContactCompany = document.getElementById('inputContactCompany');
+var tbodyContact = document.getElementById('tbodyContact');
 var arrowDownSearch = document.getElementById('arrowDownSearch');
 var searchOptions = document.getElementById('searchOptions');
 var inputContactNameToSearch = document.getElementById('inputContactNameToSearch');
 var inputContactPositionToSearch = document.getElementById('inputContactPositionToSearch');
 var inputContactLocationToSearch = document.getElementById('inputContactLocationToSearch');
 var inputContactCompanyToSearch = document.getElementById('inputContactCompanyToSearch');
+var inputContactLastnameToSearch = document.getElementById('inputContactLastnameToSearch');
+inputSelectedInterest.addEventListener('click', function () {
+  var interestPercentage = inputSelectedInterest.options[inputSelectedInterest.selectedIndex].value;
+  progressInterest.value = interestPercentage;
+});
 arrowDownSearch.addEventListener('click', function () {
-  searchOptions.classList.remove('dnone');
-  searchOptions.classList.add('searchOptions');
+  searchOptions.classList.toggle('dnone');
+  searchOptions.classList.toggle('searchOptions');
   assignRegionToForm(inputContactLocationToSearch);
   assignCompaniesToForm(inputContactCompanyToSearch);
 });
 var searchLens = document.getElementById('searchLens');
 searchLens.addEventListener('click', function _callee() {
-  var body, url, response, results;
+  var url, response, results;
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          body = {
-            name: inputContactNameToSearch.value,
-            position: inputContactPositionToSearch.value,
-            location: inputContactLocationToSearch.options[inputContactLocationToSearch.selectedIndex].value,
-            company: inputContactCompanyToSearch.options[inputContactCompanyToSearch.selectedIndex].value
-          };
-          url = "http://localhost:3010/contacts/search?name:".concat(body.name, "?position:").concat(body.position, "?location").concat(body.location, "?company:").concat(body.company);
-          _context.next = 4;
+          url = "http://localhost:3010/contacts/search";
+          _context.next = 3;
           return regeneratorRuntime.awrap(fetch(url, {
             method: 'GET',
             headers: {
               Authorization: 'Bearer ' + TOKEN,
               body: JSON.stringify({
-                body: body
+                name: inputContactNameToSearch.value,
+                lastname: inputContactLastnameToSearch.value,
+                position: inputContactPositionToSearch.value,
+                // location: inputContactLocationToSearch.options[inputContactLocationToSearch.selectedIndex].value,
+                company: inputContactCompanyToSearch.options[inputContactCompanyToSearch.selectedIndex].value
               })
             }
           }));
 
-        case 4:
+        case 3:
           response = _context.sent;
-          _context.next = 7;
+          _context.next = 6;
           return regeneratorRuntime.awrap(response.json());
 
-        case 7:
+        case 6:
           results = _context.sent;
+          tbodyContact.innerHTML = "";
+          renderContacts(results);
 
-        case 8:
+        case 9:
         case "end":
           return _context.stop();
       }
@@ -265,9 +274,8 @@ function deleteRegister(path, id) {
     while (1) {
       switch (_context4.prev = _context4.next) {
         case 0:
-          console.log(path);
           url = "http://localhost:3010/".concat(path, "/").concat(id);
-          _context4.next = 4;
+          _context4.next = 3;
           return regeneratorRuntime.awrap(fetch(url, {
             method: "DELETE",
             headers: {
@@ -275,10 +283,10 @@ function deleteRegister(path, id) {
             }
           }));
 
-        case 4:
+        case 3:
           response = _context4.sent;
 
-        case 5:
+        case 4:
         case "end":
           return _context4.stop();
       }
@@ -407,12 +415,16 @@ function renderRegions(results, liSection) {
 
 function renderContacts(results) {
   results.forEach(function (item) {
+    console.log(item);
     var tr = document.createElement('tr');
     var actionsButton = document.createElement('i');
     var editButton = document.createElement('i');
     var deleteButton = document.createElement('i');
     var allButtonsDiv = document.createElement('div');
     var buttonsDiv = document.createElement('div');
+    var checkbox = document.createElement('input');
+    checkbox.classList = 'checkbox';
+    checkbox.type = 'checkbox';
     actionsButton.alt = 'action';
     actionsButton.classList = 'fas fa-ellipsis-v';
     deleteButton.alt = 'delete';
@@ -423,6 +435,10 @@ function renderContacts(results) {
     allButtonsDiv.classList = 'allButtons';
     tr.id = item.id;
     delete item.id;
+    checkbox.addEventListener('click', function () {
+      console.log(tr);
+      clickedCheckbox(tr);
+    });
     actionsButton.addEventListener('click', function () {
       buttonsDiv.classList.remove('dnone');
       buttonsDiv.classList.add('buttonsDiv');
@@ -431,11 +447,11 @@ function renderContacts(results) {
     buttonsDiv.appendChild(deleteButton);
     allButtonsDiv.appendChild(actionsButton);
     allButtonsDiv.appendChild(buttonsDiv);
+    editButton.addEventListener('click', function () {
+      return openEditWindow(item, tr.id, item.name, item.lastname);
+    });
     deleteButton.addEventListener('click', function () {
       return openCompaniesOrUsersWindow(item.name + " " + item.lastname, tr.id, deleteContactSection, contactsSection, buttonsDiv);
-    });
-    editButton.addEventListener('click', function () {
-      return openCompaniesOrUsersWindow();
     });
     var registerValues = Object.values(item);
     var tdNameAndEmail = document.createElement('td');
@@ -444,13 +460,14 @@ function renderContacts(results) {
     var tdPosition = document.createElement('td');
     var tdFavoriteChannel = document.createElement('td');
     var tdInterest = document.createElement('td');
-    tdNameAndEmail.innerHTML = item.fullname + '<br>' + item.email;
+    tdNameAndEmail.innerHTML = item.name + " " + item.lastname + '<br>' + item.email;
     tdLocation.innerText = item.country + " " + item.region;
     tdCompany.innerText = item.company;
     tdPosition.innerText = item.position;
     tdFavoriteChannel.innerText = item.favoriteChannels;
     tdInterest.innerHTML = "<progress max = 100>".concat(item.interest, "</progress>");
     tdInterest.value = item.interest;
+    tr.appendChild(checkbox);
     tr.appendChild(tdNameAndEmail);
     tr.appendChild(tdLocation);
     tr.appendChild(tdCompany);
@@ -458,13 +475,7 @@ function renderContacts(results) {
     tr.appendChild(tdFavoriteChannel);
     tr.appendChild(tdInterest);
     tr.appendChild(allButtonsDiv);
-    contactsTable.appendChild(tr); // registerValues.forEach( register =>{
-    //     const td = document.createElement('td')
-    //     td.innerText = register   
-    //     tr.appendChild(td)
-    //     tr.appendChild(allButtonsDiv)
-    //     contactsTable.appendChild(tr)
-    // })
+    tbodyContact.appendChild(tr);
   });
 }
 
@@ -499,7 +510,7 @@ function renderTable(results, table, path, model) {
       return openCompaniesOrUsersWindow(item.fullname, tr.id, deleteUserSection, usersSection, buttonsDiv);
     });
     editButton.addEventListener('click', function () {
-      return openCompaniesOrUsersWindow();
+      return openEditWindow();
     });
     var registerValues = Object.values(item);
     registerValues.forEach(function (register) {
@@ -565,11 +576,13 @@ function openAddButton(model, modelDependentOnId, window) {
               changeCountry(postContactRegion, postContactCountry, postContactCity);
               assignContactChannelsToForm();
               assignContactPreferencesToForm();
+              assignCompaniesToForm(inputContactCompany);
               addContact.addEventListener('click', function () {
                 return addNewRegister('contacts', {
                   name: inputContactName.value,
                   lastname: inputContactLastname.value,
                   position: inputContactPosition.value,
+                  companyId: inputContactCompany.options[inputContactCompany.selectedIndex].value,
                   email: inputContactEmail.value,
                   cityId: inputContactCity.value,
                   address: inputContactAddress.value
@@ -608,22 +621,79 @@ function openAddButton(model, modelDependentOnId, window) {
   });
 }
 
+var selectedContacts = document.getElementById('selectedContacts');
+var deleteContacts = document.getElementById('deleteContacts');
+
+function clickedCheckbox(tr) {
+  var selectedContactsArray;
+  return regeneratorRuntime.async(function clickedCheckbox$(_context7) {
+    while (1) {
+      switch (_context7.prev = _context7.next) {
+        case 0:
+          selectedContactsArray = [];
+          tr.classList.toggle('blue');
+
+          if (tr.classList == 'blue') {
+            selectedContactsArray.push(tr.id);
+          } else {
+            selectedContactsArray.filter(function (i) {
+              return i !== tr.id;
+            });
+          }
+
+          if (selectedContactsArray.length == 0) {
+            selectedContacts.innerText = "";
+            selectedContacts.className = 'dnone';
+          } else {
+            selectedContacts.innerText = "".concat(selectedContactsArray.length, " seleccionados");
+            selectedContacts.className = 'selectedContacts';
+            deleteContacts.className = 'locations-buttons';
+            deleteContacts.addEventListener('click', function () {
+              selectedContactsArray.forEach(function (item) {
+                deleteRegister('contacts', +item);
+              });
+            });
+          }
+
+        case 4:
+        case "end":
+          return _context7.stop();
+      }
+    }
+  });
+}
+
 var userLogin = document.getElementById('userLogin');
 var passwordLogin = document.getElementById('passwordLogin');
 var loginButton = document.getElementById('loginButton');
 var loginSection = document.getElementById('loginSection');
 var incorrectData = document.getElementById('incorrectData');
 var nav = document.getElementById('nav');
+
+if (TOKEN != null) {
+  loginSection.classList.remove('fixed-window');
+  loginSection.classList.add('dnone');
+
+  if (TOKEN.adminPrivilege == true) {
+    nav.classList.remove('dnone');
+    nav.classList.add('ul-nav');
+  } else {
+    nav.classList.remove('dnone');
+    nav.classList.add('ul-nav');
+    usersLi.classList.add('dnone');
+  }
+}
+
 loginButton.addEventListener('click', function _callee2() {
   var userLoginValue, passwordLoginValue, url, response, permiso, sessionLogin;
-  return regeneratorRuntime.async(function _callee2$(_context9) {
+  return regeneratorRuntime.async(function _callee2$(_context10) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context10.prev = _context10.next) {
         case 0:
           sessionLogin = function _ref2(response) {
-            return regeneratorRuntime.async(function sessionLogin$(_context8) {
+            return regeneratorRuntime.async(function sessionLogin$(_context9) {
               while (1) {
-                switch (_context8.prev = _context8.next) {
+                switch (_context9.prev = _context9.next) {
                   case 0:
                     console.log(response);
                     sessionStorage.setItem('userToken', response.userToken); // const myHeaders = new Headers()
@@ -640,7 +710,7 @@ loginButton.addEventListener('click', function _callee2() {
 
                   case 3:
                   case "end":
-                    return _context8.stop();
+                    return _context9.stop();
                 }
               }
             });
@@ -648,15 +718,15 @@ loginButton.addEventListener('click', function _callee2() {
 
           permiso = function _ref(response) {
             var resultsStatus;
-            return regeneratorRuntime.async(function permiso$(_context7) {
+            return regeneratorRuntime.async(function permiso$(_context8) {
               while (1) {
-                switch (_context7.prev = _context7.next) {
+                switch (_context8.prev = _context8.next) {
                   case 0:
-                    _context7.next = 2;
+                    _context8.next = 2;
                     return regeneratorRuntime.awrap(response.status);
 
                   case 2:
-                    resultsStatus = _context7.sent;
+                    resultsStatus = _context8.sent;
 
                     if (resultsStatus == 200) {
                       loginSection.classList.remove('fixed-window');
@@ -666,11 +736,11 @@ loginButton.addEventListener('click', function _callee2() {
                       incorrectData.classList.add('warning');
                     }
 
-                    return _context7.abrupt("return", response);
+                    return _context8.abrupt("return", response);
 
                   case 5:
                   case "end":
-                    return _context7.stop();
+                    return _context8.stop();
                 }
               }
             });
@@ -679,7 +749,7 @@ loginButton.addEventListener('click', function _callee2() {
           userLoginValue = userLogin.value;
           passwordLoginValue = passwordLogin.value;
           url = "http://localhost:3010/login";
-          _context9.next = 7;
+          _context10.next = 7;
           return regeneratorRuntime.awrap(fetch(url, {
             headers: {
               'Accept': 'application/json',
@@ -700,11 +770,11 @@ loginButton.addEventListener('click', function _callee2() {
           }));
 
         case 7:
-          response = _context9.sent;
+          response = _context10.sent;
 
         case 8:
         case "end":
-          return _context9.stop();
+          return _context10.stop();
       }
     }
   });
@@ -763,6 +833,39 @@ function openWindow(method, registerToDelete, buttonClickedId, section) {
   }
 }
 
+var editContactWindow = document.getElementById('editContactWindow');
+var editContactName = document.getElementById('editContactName');
+var editContactLastname = document.getElementById('editContactLastname');
+var editContactPosition = document.getElementById('editContactPosition');
+var editContactEmail = document.getElementById('editContactEmail');
+var editContactCompany = document.getElementById('editContactCompany');
+var editContactRegion = document.getElementById('editContactRegion');
+var editContactCountry = document.getElementById('editContactCountry');
+var editContactCity = document.getElementById('editContactCity');
+
+function openEditWindow(item, id) {
+  return regeneratorRuntime.async(function openEditWindow$(_context11) {
+    while (1) {
+      switch (_context11.prev = _context11.next) {
+        case 0:
+          assignRegionToForm(editContactRegion);
+          changeCountry(editContactRegion, editContactCountry, editContactCity);
+          editContactWindow.classList.remove('dnone');
+          editContactWindow.classList.add('fixed-window');
+          editContactPosition.value = item.position;
+          editContactEmail.value = item.email;
+          editContactName.value = item.name;
+          editContactLastname.value = item.lastname;
+          editContactCompany.value = item.company;
+
+        case 9:
+        case "end":
+          return _context11.stop();
+      }
+    }
+  });
+}
+
 function openCompaniesOrUsersWindow(registerToDelete, buttonClickedId, window, section, buttonsDiv) {
   window.classList.remove('dnone');
   window.classList.add('fixed-window');
@@ -785,75 +888,11 @@ function closeWindow(window, mainSection) {
 
 function getLocations() {
   var url, response, results;
-  return regeneratorRuntime.async(function getLocations$(_context10) {
-    while (1) {
-      switch (_context10.prev = _context10.next) {
-        case 0:
-          url = "http://localhost:3010/regions";
-          _context10.next = 3;
-          return regeneratorRuntime.awrap(fetch(url, {
-            method: 'GET',
-            headers: {
-              Authorization: 'Bearer ' + TOKEN
-            }
-          }));
-
-        case 3:
-          response = _context10.sent;
-          _context10.next = 6;
-          return regeneratorRuntime.awrap(response.json());
-
-        case 6:
-          results = _context10.sent;
-          return _context10.abrupt("return", results);
-
-        case 8:
-        case "end":
-          return _context10.stop();
-      }
-    }
-  });
-}
-
-function getContactChannels() {
-  var url, response, results;
-  return regeneratorRuntime.async(function getContactChannels$(_context11) {
-    while (1) {
-      switch (_context11.prev = _context11.next) {
-        case 0:
-          url = "http://localhost:3010/contactchannels";
-          _context11.next = 3;
-          return regeneratorRuntime.awrap(fetch(url, {
-            method: 'GET',
-            headers: {
-              Authorization: 'Bearer ' + TOKEN
-            }
-          }));
-
-        case 3:
-          response = _context11.sent;
-          _context11.next = 6;
-          return regeneratorRuntime.awrap(response.json());
-
-        case 6:
-          results = _context11.sent;
-          return _context11.abrupt("return", results);
-
-        case 8:
-        case "end":
-          return _context11.stop();
-      }
-    }
-  });
-}
-
-function getContactPreferences() {
-  var url, response, results;
-  return regeneratorRuntime.async(function getContactPreferences$(_context12) {
+  return regeneratorRuntime.async(function getLocations$(_context12) {
     while (1) {
       switch (_context12.prev = _context12.next) {
         case 0:
-          url = "http://localhost:3010/preferences";
+          url = "http://localhost:3010/regions";
           _context12.next = 3;
           return regeneratorRuntime.awrap(fetch(url, {
             method: 'GET',
@@ -879,17 +918,81 @@ function getContactPreferences() {
   });
 }
 
-function assignRegionToForm(postRegion) {
-  var allLocations;
-  return regeneratorRuntime.async(function assignRegionToForm$(_context13) {
+function getContactChannels() {
+  var url, response, results;
+  return regeneratorRuntime.async(function getContactChannels$(_context13) {
     while (1) {
       switch (_context13.prev = _context13.next) {
         case 0:
-          _context13.next = 2;
+          url = "http://localhost:3010/contactchannels";
+          _context13.next = 3;
+          return regeneratorRuntime.awrap(fetch(url, {
+            method: 'GET',
+            headers: {
+              Authorization: 'Bearer ' + TOKEN
+            }
+          }));
+
+        case 3:
+          response = _context13.sent;
+          _context13.next = 6;
+          return regeneratorRuntime.awrap(response.json());
+
+        case 6:
+          results = _context13.sent;
+          return _context13.abrupt("return", results);
+
+        case 8:
+        case "end":
+          return _context13.stop();
+      }
+    }
+  });
+}
+
+function getContactPreferences() {
+  var url, response, results;
+  return regeneratorRuntime.async(function getContactPreferences$(_context14) {
+    while (1) {
+      switch (_context14.prev = _context14.next) {
+        case 0:
+          url = "http://localhost:3010/preferences";
+          _context14.next = 3;
+          return regeneratorRuntime.awrap(fetch(url, {
+            method: 'GET',
+            headers: {
+              Authorization: 'Bearer ' + TOKEN
+            }
+          }));
+
+        case 3:
+          response = _context14.sent;
+          _context14.next = 6;
+          return regeneratorRuntime.awrap(response.json());
+
+        case 6:
+          results = _context14.sent;
+          return _context14.abrupt("return", results);
+
+        case 8:
+        case "end":
+          return _context14.stop();
+      }
+    }
+  });
+}
+
+function assignRegionToForm(postRegion) {
+  var allLocations;
+  return regeneratorRuntime.async(function assignRegionToForm$(_context15) {
+    while (1) {
+      switch (_context15.prev = _context15.next) {
+        case 0:
+          _context15.next = 2;
           return regeneratorRuntime.awrap(getLocations());
 
         case 2:
-          allLocations = _context13.sent;
+          allLocations = _context15.sent;
           allLocations.forEach(function (region) {
             var option = document.createElement('option');
             option.innerText = region.regionName;
@@ -900,7 +1003,7 @@ function assignRegionToForm(postRegion) {
 
         case 4:
         case "end":
-          return _context13.stop();
+          return _context15.stop();
       }
     }
   });
@@ -908,15 +1011,15 @@ function assignRegionToForm(postRegion) {
 
 function assignContactChannelsToForm() {
   var allContactChannels;
-  return regeneratorRuntime.async(function assignContactChannelsToForm$(_context14) {
+  return regeneratorRuntime.async(function assignContactChannelsToForm$(_context16) {
     while (1) {
-      switch (_context14.prev = _context14.next) {
+      switch (_context16.prev = _context16.next) {
         case 0:
-          _context14.next = 2;
+          _context16.next = 2;
           return regeneratorRuntime.awrap(getContactChannels());
 
         case 2:
-          allContactChannels = _context14.sent;
+          allContactChannels = _context16.sent;
           console.log(allContactChannels);
           allContactChannels.forEach(function (contact) {
             var option = document.createElement('option');
@@ -928,7 +1031,7 @@ function assignContactChannelsToForm() {
 
         case 5:
         case "end":
-          return _context14.stop();
+          return _context16.stop();
       }
     }
   });
@@ -936,15 +1039,15 @@ function assignContactChannelsToForm() {
 
 function assignContactPreferencesToForm() {
   var allContactPreferences;
-  return regeneratorRuntime.async(function assignContactPreferencesToForm$(_context15) {
+  return regeneratorRuntime.async(function assignContactPreferencesToForm$(_context17) {
     while (1) {
-      switch (_context15.prev = _context15.next) {
+      switch (_context17.prev = _context17.next) {
         case 0:
-          _context15.next = 2;
+          _context17.next = 2;
           return regeneratorRuntime.awrap(getContactPreferences());
 
         case 2:
-          allContactPreferences = _context15.sent;
+          allContactPreferences = _context17.sent;
           console.log(allContactPreferences);
           allContactPreferences.forEach(function (contact) {
             var option = document.createElement('option');
@@ -956,7 +1059,7 @@ function assignContactPreferencesToForm() {
 
         case 5:
         case "end":
-          return _context15.stop();
+          return _context17.stop();
       }
     }
   });
@@ -964,12 +1067,12 @@ function assignContactPreferencesToForm() {
 
 function assignCompaniesToForm(selectCompany) {
   var url, response, results;
-  return regeneratorRuntime.async(function assignCompaniesToForm$(_context16) {
+  return regeneratorRuntime.async(function assignCompaniesToForm$(_context18) {
     while (1) {
-      switch (_context16.prev = _context16.next) {
+      switch (_context18.prev = _context18.next) {
         case 0:
           url = "http://localhost:3010/companies";
-          _context16.next = 3;
+          _context18.next = 3;
           return regeneratorRuntime.awrap(fetch(url, {
             method: 'GET',
             headers: {
@@ -978,12 +1081,12 @@ function assignCompaniesToForm(selectCompany) {
           }));
 
         case 3:
-          response = _context16.sent;
-          _context16.next = 6;
+          response = _context18.sent;
+          _context18.next = 6;
           return regeneratorRuntime.awrap(response.json());
 
         case 6:
-          results = _context16.sent;
+          results = _context18.sent;
           results.forEach(function (company) {
             var option = document.createElement('option');
             option.innerText = company.name;
@@ -994,26 +1097,26 @@ function assignCompaniesToForm(selectCompany) {
 
         case 8:
         case "end":
-          return _context16.stop();
+          return _context18.stop();
       }
     }
   });
 }
 
 function changeCountry(postRegion, postCountry, postCity) {
-  return regeneratorRuntime.async(function changeCountry$(_context19) {
+  return regeneratorRuntime.async(function changeCountry$(_context21) {
     while (1) {
-      switch (_context19.prev = _context19.next) {
+      switch (_context21.prev = _context21.next) {
         case 0:
           postRegion.addEventListener('change', function _callee4(event) {
             var chosenRegionId, url, response, results;
-            return regeneratorRuntime.async(function _callee4$(_context18) {
+            return regeneratorRuntime.async(function _callee4$(_context20) {
               while (1) {
-                switch (_context18.prev = _context18.next) {
+                switch (_context20.prev = _context20.next) {
                   case 0:
                     chosenRegionId = postRegion.options[postRegion.selectedIndex].value;
                     url = "http://localhost:3010/countries/".concat(chosenRegionId);
-                    _context18.next = 4;
+                    _context20.next = 4;
                     return regeneratorRuntime.awrap(fetch(url, {
                       method: 'GET',
                       headers: {
@@ -1022,12 +1125,12 @@ function changeCountry(postRegion, postCountry, postCity) {
                     }));
 
                   case 4:
-                    response = _context18.sent;
-                    _context18.next = 7;
+                    response = _context20.sent;
+                    _context20.next = 7;
                     return regeneratorRuntime.awrap(response.json());
 
                   case 7:
-                    results = _context18.sent;
+                    results = _context20.sent;
                     results.forEach(function (country) {
                       var option = document.createElement('option');
                       option.innerText = country.countryName;
@@ -1036,13 +1139,13 @@ function changeCountry(postRegion, postCountry, postCity) {
                       postCountry.appendChild(option);
                       postCountry.addEventListener('change', function _callee3(event) {
                         var chosenCountryId, cityUrl, cityResponse, cityResults;
-                        return regeneratorRuntime.async(function _callee3$(_context17) {
+                        return regeneratorRuntime.async(function _callee3$(_context19) {
                           while (1) {
-                            switch (_context17.prev = _context17.next) {
+                            switch (_context19.prev = _context19.next) {
                               case 0:
                                 chosenCountryId = postCountry.options[postCountry.selectedIndex].value;
                                 cityUrl = "http://localhost:3010/cities/".concat(chosenCountryId);
-                                _context17.next = 4;
+                                _context19.next = 4;
                                 return regeneratorRuntime.awrap(fetch(cityUrl, {
                                   method: 'GET',
                                   headers: {
@@ -1051,12 +1154,12 @@ function changeCountry(postRegion, postCountry, postCity) {
                                 }));
 
                               case 4:
-                                cityResponse = _context17.sent;
-                                _context17.next = 7;
+                                cityResponse = _context19.sent;
+                                _context19.next = 7;
                                 return regeneratorRuntime.awrap(cityResponse.json());
 
                               case 7:
-                                cityResults = _context17.sent;
+                                cityResults = _context19.sent;
                                 console.log(cityResults);
                                 cityResults.forEach(function (city) {
                                   var option = document.createElement('option');
@@ -1068,7 +1171,7 @@ function changeCountry(postRegion, postCountry, postCity) {
 
                               case 10:
                               case "end":
-                                return _context17.stop();
+                                return _context19.stop();
                             }
                           }
                         });
@@ -1077,7 +1180,7 @@ function changeCountry(postRegion, postCountry, postCity) {
 
                   case 9:
                   case "end":
-                    return _context18.stop();
+                    return _context20.stop();
                 }
               }
             });
@@ -1085,7 +1188,7 @@ function changeCountry(postRegion, postCountry, postCity) {
 
         case 1:
         case "end":
-          return _context19.stop();
+          return _context21.stop();
       }
     }
   });

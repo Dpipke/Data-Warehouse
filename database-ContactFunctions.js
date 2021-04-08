@@ -51,4 +51,17 @@ async function deleteContact(id){
         }
     })
 }
-module.exports = {getContacts, getContactChannels, getContactPreferences, deleteContact}
+async function searchContacts(register){
+    const object = JSON.parse(register)
+    const set = Object.entries(object).reduce((output, [key, value]) => value? Object.assign({}, output, { [key]: value }) : output, {})
+    const contactsSearch = await Contact.findAll({
+    where: 
+        set    
+    ,include: {
+        all: true,
+        nested: true,
+    },});
+    return contactsSearch
+
+}
+module.exports = {getContacts, getContactChannels, getContactPreferences, deleteContact, searchContacts}

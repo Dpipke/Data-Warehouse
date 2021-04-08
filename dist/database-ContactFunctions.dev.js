@@ -1,5 +1,15 @@
 "use strict";
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 var _require = require("sequelize"),
     Sequelize = _require.Sequelize,
     DataTypes = _require.DataTypes;
@@ -128,9 +138,45 @@ function deleteContact(id) {
   });
 }
 
+function searchContacts(register) {
+  var object, set, contactsSearch;
+  return regeneratorRuntime.async(function searchContacts$(_context5) {
+    while (1) {
+      switch (_context5.prev = _context5.next) {
+        case 0:
+          object = JSON.parse(register);
+          set = Object.entries(object).reduce(function (output, _ref) {
+            var _ref2 = _slicedToArray(_ref, 2),
+                key = _ref2[0],
+                value = _ref2[1];
+
+            return value ? Object.assign({}, output, _defineProperty({}, key, value)) : output;
+          }, {});
+          _context5.next = 4;
+          return regeneratorRuntime.awrap(Contact.findAll({
+            where: set,
+            include: {
+              all: true,
+              nested: true
+            }
+          }));
+
+        case 4:
+          contactsSearch = _context5.sent;
+          return _context5.abrupt("return", contactsSearch);
+
+        case 6:
+        case "end":
+          return _context5.stop();
+      }
+    }
+  });
+}
+
 module.exports = {
   getContacts: getContacts,
   getContactChannels: getContactChannels,
   getContactPreferences: getContactPreferences,
-  deleteContact: deleteContact
+  deleteContact: deleteContact,
+  searchContacts: searchContacts
 };

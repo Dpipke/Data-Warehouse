@@ -34,15 +34,18 @@
                     <input type="text" class="searchInput">
                     <i class="fas fa-caret-down" id="arrowDownSearch"></i>
                 </div>
+                <p class="dnone" id="selectedContacts"></p>
                 <div class="dnone" id="searchOptions">
-                    <p>Nombre del Cargo</p>
+                    <p>Nombre del Contacto</p>
                     <input type="text" id="inputContactNameToSearch">
+                    <p>Apellido del Contacto</p>
+                    <input type="text" id="inputContactLastnameToSearch">
                     <p>Cargo</p>
                     <input type="text" id="inputContactPositionToSearch">
-                    <p>País/Region</p>
+                    <!-- <p>País/Region</p>
                     <select name="" id="inputContactLocationToSearch">
                         <option value="">Seleccione...</option>
-                    </select>
+                    </select> -->
                     <p>Compañía</p>
                     <select name="" id="inputContactCompanyToSearch">
                         <option value="">Seleccione...</option>
@@ -52,17 +55,24 @@
                 <div>
                     <i class="fas fa-download"></i>
                     <i class="fas fa-sort-down">Exportar contactos</i>
-                    <p id="addContactButton">Agregar contacto</p>
+                    <p class="locations-buttons" id="addContactButton">Agregar contacto</p>
+                    <p class='dnone'id="deleteContacts">Eliminar contactos</p>
                 </div>
             </div>
             <table id="contacts-table">
-                <th>Contacto</th>
-                <th>País/Región</th>
-                <th>Compañía</th>
-                <th>Cargo</th>
-                <th>Canal Preferido</th>
-                <th>Interés</th>
-                <th>Acciones</th>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox"></th>
+                        <th>Contacto</th>
+                        <th>País/Región</th>
+                        <th>Compañía</th>
+                        <th>Cargo</th>
+                        <th>Canal Preferido</th>
+                        <th>Interés</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyContact"></tbody>
             </table>
             <div class="dnone" id="addContactWindow">
                 <div class="header-section headerCompany">
@@ -88,7 +98,9 @@
                         </label>
                         <label for="company">
                             <p>Compañía</p>
-                            <input type="text" name="company" id="inputContactCompany">
+                            <select name="company" required id="inputContactCompany">
+                                <option value="-">Seleccione...</option>
+                            </select>   
                         </label>
                     </fieldset>
                     <fieldset>
@@ -116,7 +128,16 @@
                         </label>
                         <label for="interest">
                             <p>Interés</p>
-                            <progress max="100"></progress>
+                            <progress max="100" id="progressInterest"></progress>
+                        </label>
+                        <label for="percentage">
+                            <select name="percentage" id="inputSelectedInterest">
+                                <option value="0">0%</option>
+                                <option value="25">25%</option>
+                                <option value="50">50%</option>
+                                <option value="75">75%</option>
+                                <option value="100">100%</option>
+                            </select>
                         </label>
                     </fieldset>
                     <fieldset>
@@ -151,6 +172,87 @@
                     <p class="locations-buttons confirmDeleteRegister" id="deleteContactButton">Eliminar</p>    
                 </div>
             </div>
+            <div class="dnone" id="editContactWindow">
+                <div class="header-section headerCompany">
+                    <h2>Editar Contacto</h2>
+                </div>
+                <form action="post" class="addContactForm">
+                    <fieldset class="registerFieldset">
+                        <label for="name">
+                            <p>Nombre</p>
+                            <input type="text" name="name" id="editContactName">
+                        </label>
+                        <label for="lastname">
+                            <p>Apellido</p>
+                            <input type="text" name="lastname" id="editContactLastname">
+                        </label>
+                        <label for="position">
+                            <p>Cargo</p>
+                            <input type="text" name="position" id="editContactPosition">
+                        </label>
+                        <label for="email">
+                            <p>Email</p>
+                            <input type="text" name="email" id="editContactEmail">
+                        </label>
+                        <label for="company">
+                            <p>Compañía</p>
+                            <input type="text" name="company" id="editContactCompany">
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="region">
+                            <p>Región</p>
+                            <select name="region" required id="editContactRegion">
+                                <option value="-">Seleccione...</option>
+                            </select>                        
+                        </label>
+                        <label for="country">
+                            <p>País</p>
+                            <select name="country" required id="editContactCountry">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </label>
+                        <label for="city">
+                            <p>Ciudad</p>
+                            <select name="city" required id="editContactCity">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </label>
+                        <label for="address">
+                            <p>Dirección</p>
+                            <input type="text" name="address" id="editContactAddress">
+                        </label>
+                        <label for="interest">
+                            <p>Interés</p>
+                            <progress max="100"></progress>
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="contactChannel">
+                            <p>Canal de contacto</p>
+                            <select name="contactChannel" required id="editContactChannel">
+                                <option value="-"></option>
+                            </select>                        
+                        </label>
+                        <label for="userAccount">
+                            <p>Cuenta de Usuario</p>
+                            <input type="text" name="userAccount" id="edittContactAddress">
+                        </label>
+                        <label for="contactPreference">
+                            <p>Preferencias</p>
+                            <select name="contactPreference" required id="editContactPreference">
+                                <option value="-"></option>
+                            </select>                        
+                        </label>
+                    </fieldset>
+                </form>
+                <div class="buttons">
+                    <p class="locations-buttons cancelAddRegister" id="cancelAddCompany">Cancelar</p>
+                    <p class="locations-buttons addRegisterButton" id="addContact">Agregar Contacto</p>
+                </div>
+            </div>
+
+
         </section>
         <section class='dnone' id="region-section">
             <div class='dnone' id="add-location">

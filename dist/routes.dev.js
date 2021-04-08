@@ -33,7 +33,8 @@ var _require3 = require('./database-ContactFunctions'),
     getContacts = _require3.getContacts,
     getContactChannels = _require3.getContactChannels,
     getContactPreferences = _require3.getContactPreferences,
-    deleteContact = _require3.deleteContact;
+    deleteContact = _require3.deleteContact,
+    searchContacts = _require3.searchContacts;
 
 app.use(bodyParser.json());
 app.use(helmet());
@@ -689,7 +690,8 @@ app.get('/contacts', function _callee26(req, res) {
           mappedContacts = allContacts.forEach(function (item) {
             var eachContact = Object.assign({
               id: item.id,
-              fullname: item.name + " " + item.lastname,
+              name: item.name,
+              lastname: item.lastname,
               email: item.email,
               country: item.City.Country.name,
               region: item.City.Country.Region.name,
@@ -748,14 +750,49 @@ app["delete"]('/contacts/:id', function _callee28(req, res) {
     }
   });
 });
-app.get('/contacts/search/:name?/:position?/:location?/:company?', function _callee29(req, res) {
+app.get('/contacts/search', function _callee29(req, res) {
+  var filters, contacts, contactsObtained, mappedContacts;
   return regeneratorRuntime.async(function _callee29$(_context29) {
     while (1) {
       switch (_context29.prev = _context29.next) {
         case 0:
-          console.log(req.params.name);
+          filters = req.headers.body;
+          _context29.next = 3;
+          return regeneratorRuntime.awrap(searchContacts(filters));
 
-        case 1:
+        case 3:
+          contacts = _context29.sent;
+          contactsObtained = [];
+          mappedContacts = contacts.forEach(function (item) {
+            var eachContact = Object.assign({
+              id: item.id,
+              name: item.name,
+              lastname: item.lastname,
+              email: item.email,
+              country: item.City.Country.name,
+              region: item.City.Country.Region.name,
+              company: item.Company.name,
+              position: item.position,
+              favoriteChannels: [],
+              interest: item.interest
+            });
+            var favoriteChannels = contacts.map(function (element) {
+              if (item.id == element.id) {
+                var contactChannels = element.contact_channels;
+                contactChannels.forEach(function (channel) {
+                  if (channel.preference.name == 'Favorito') {
+                    eachContact.favoriteChannels.push(channel.contact_social_medium.name);
+                    contactsObtained.push(eachContact);
+                  }
+                });
+              } else {
+                contactsObtained.push(eachContact);
+              }
+            });
+          });
+          res.status(200).json(contactsObtained);
+
+        case 7:
         case "end":
           return _context29.stop();
       }

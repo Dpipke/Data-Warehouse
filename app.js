@@ -53,13 +53,17 @@ const inputCompanyName = document.getElementById('inputCompanyName')
 const inputCompanyAddress = document.getElementById('inputCompanyAddress')
 const inputCompanyEmail = document.getElementById('inputCompanyEmail')
 const inputCompanyTelephone = document.getElementById('inputCompanyTelephone')
+const inputSelectedInterest = document.getElementById('inputSelectedInterest')
+const progressInterest = document.getElementById('progressInterest')
 
 const inputContactName = document.getElementById('inputContactName')
 const inputContactLastname = document.getElementById('inputContactLastname')
-const inputContactPosition = document.getElementById('inputPosition')
+const inputContactPosition = document.getElementById('inputContactPosition')
 const inputContactEmail = document.getElementById('inputContactEmail')
 const inputContactCity = document.getElementById('inputContactCity')
 const inputContactAddress = document.getElementById('inputContactAddress')
+const inputContactCompany = document.getElementById('inputContactCompany')
+const tbodyContact = document.getElementById('tbodyContact')
 
 const arrowDownSearch = document.getElementById('arrowDownSearch')
 const searchOptions = document.getElementById('searchOptions')
@@ -68,31 +72,41 @@ const inputContactNameToSearch = document.getElementById('inputContactNameToSear
 const inputContactPositionToSearch = document.getElementById('inputContactPositionToSearch')
 const inputContactLocationToSearch = document.getElementById('inputContactLocationToSearch')
 const inputContactCompanyToSearch = document.getElementById('inputContactCompanyToSearch')
+const inputContactLastnameToSearch = document.getElementById('inputContactLastnameToSearch')
+
+inputSelectedInterest.addEventListener('click', ()=>{
+    const interestPercentage = inputSelectedInterest.options[inputSelectedInterest.selectedIndex].value
+    progressInterest.value = interestPercentage
+
+})
 
 arrowDownSearch.addEventListener('click', ()=> {
-    searchOptions.classList.remove('dnone')
-    searchOptions.classList.add('searchOptions')
+    searchOptions.classList.toggle('dnone')
+    searchOptions.classList.toggle('searchOptions')
     assignRegionToForm(inputContactLocationToSearch)
     assignCompaniesToForm(inputContactCompanyToSearch)
 } )
 
 const searchLens = document.getElementById('searchLens')
 searchLens.addEventListener('click', async ()=>{
-    const body = {
-        name: inputContactNameToSearch.value,
-        position: inputContactPositionToSearch.value,
-        location: inputContactLocationToSearch.options[inputContactLocationToSearch.selectedIndex].value,
-        company: inputContactCompanyToSearch.options[inputContactCompanyToSearch.selectedIndex].value
-    }
-    const url = `http://localhost:3010/contacts/search?name:${body.name}?position:${body.position}?location${body.location}?company:${body.company}`
+
+    const url = `http://localhost:3010/contacts/search`
     const response = await fetch(url, {
         method: 'GET',
         headers: {
         Authorization: 'Bearer ' + TOKEN,
-        body: JSON.stringify({body})
-      },
+        body: JSON.stringify({
+            name: inputContactNameToSearch.value,
+            lastname: inputContactLastnameToSearch.value,
+            position: inputContactPositionToSearch.value,
+            // location: inputContactLocationToSearch.options[inputContactLocationToSearch.selectedIndex].value,
+            company: inputContactCompanyToSearch.options[inputContactCompanyToSearch.selectedIndex].value
+        })
+    },
     })
     const results = await response.json()
+    tbodyContact.innerHTML = ""
+    renderContacts(results)
 
 } )
 
@@ -187,7 +201,6 @@ async function addNewRegister(path,  body, window, mainSection, successWindow, c
 }
 
 async function deleteRegister(path, id){
-    console.log(path)
     const url = `http://localhost:3010/${path}/${id}`
     const response = await fetch(url, {
         method: "DELETE",
@@ -287,12 +300,16 @@ function renderRegions(results, liSection){
 
 function renderContacts(results){
     results.forEach(item =>{
+        console.log(item)
         const tr = document.createElement('tr')
         const actionsButton = document.createElement('i')
         const editButton = document.createElement('i')
         const deleteButton = document.createElement('i')
         const allButtonsDiv = document.createElement('div')
         const buttonsDiv = document.createElement('div')
+        const checkbox = document.createElement('input')
+        checkbox.classList = 'checkbox'
+        checkbox.type = 'checkbox'
         actionsButton.alt = 'action'
         actionsButton.classList = 'fas fa-ellipsis-v'
         deleteButton.alt = 'delete'
@@ -303,6 +320,9 @@ function renderContacts(results){
         allButtonsDiv.classList= 'allButtons'
         tr.id = item.id
         delete item.id
+        checkbox.addEventListener('click', () => {
+            console.log(tr)
+            clickedCheckbox(tr)})
         actionsButton.addEventListener('click', () => {
             buttonsDiv.classList.remove('dnone')
             buttonsDiv.classList.add('buttonsDiv')
@@ -311,8 +331,8 @@ function renderContacts(results){
         buttonsDiv.appendChild(deleteButton)
         allButtonsDiv.appendChild(actionsButton)
         allButtonsDiv.appendChild(buttonsDiv)
+        editButton.addEventListener('click', () => openEditWindow(item, tr.id, item.name, item.lastname))
         deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name+" "+ item.lastname , tr.id, deleteContactSection, contactsSection, buttonsDiv))
-        editButton.addEventListener('click', () => openCompaniesOrUsersWindow())
         const registerValues = Object.values(item)
         const tdNameAndEmail = document.createElement('td')
         const tdLocation = document.createElement('td')
@@ -320,13 +340,14 @@ function renderContacts(results){
         const tdPosition = document.createElement('td')
         const tdFavoriteChannel = document.createElement('td')
         const tdInterest = document.createElement('td')
-        tdNameAndEmail.innerHTML = item.fullname + '<br>'+ item.email
+        tdNameAndEmail.innerHTML = item.name+" "+ item.lastname + '<br>'+ item.email
         tdLocation.innerText = item.country + " "+item.region
         tdCompany.innerText = item.company
         tdPosition.innerText = item.position
         tdFavoriteChannel.innerText = item.favoriteChannels
         tdInterest.innerHTML = `<progress max = 100>${item.interest}</progress>`
         tdInterest.value = item.interest
+        tr.appendChild(checkbox)
         tr.appendChild(tdNameAndEmail)
         tr.appendChild(tdLocation)
         tr.appendChild(tdCompany)
@@ -334,14 +355,8 @@ function renderContacts(results){
         tr.appendChild(tdFavoriteChannel)
         tr.appendChild(tdInterest)
         tr.appendChild(allButtonsDiv)
-        contactsTable.appendChild(tr)
-        // registerValues.forEach( register =>{
-        //     const td = document.createElement('td')
-        //     td.innerText = register   
-        //     tr.appendChild(td)
-        //     tr.appendChild(allButtonsDiv)
-        //     contactsTable.appendChild(tr)
-        // })
+        tbodyContact.appendChild(tr)
+        
         })
     
 }
@@ -373,7 +388,7 @@ function renderTable(results, table, path, model){
     allButtonsDiv.appendChild(actionsButton)
     allButtonsDiv.appendChild(buttonsDiv)
     deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.fullname , tr.id, deleteUserSection, usersSection, buttonsDiv))
-    editButton.addEventListener('click', () => openCompaniesOrUsersWindow())
+    editButton.addEventListener('click', () => openEditWindow())
     const registerValues = Object.values(item)
     registerValues.forEach( register =>{
         const td = document.createElement('td')
@@ -422,10 +437,12 @@ async function openAddButton(model, modelDependentOnId, window){
             changeCountry(postContactRegion, postContactCountry, postContactCity)
             assignContactChannelsToForm()
             assignContactPreferencesToForm()
+            assignCompaniesToForm(inputContactCompany)
             addContact.addEventListener('click', ()=> addNewRegister('contacts', {
                 name: inputContactName.value,
                 lastname: inputContactLastname.value,
                 position: inputContactPosition.value,
+                companyId: inputContactCompany.options[inputContactCompany.selectedIndex].value,
                 email: inputContactEmail.value,
                 cityId: inputContactCity.value,
                 address: inputContactAddress.value,
@@ -453,12 +470,50 @@ async function openAddButton(model, modelDependentOnId, window){
 
     }}}
 }
+const selectedContacts = document.getElementById('selectedContacts')
+const deleteContacts = document.getElementById('deleteContacts')
+async function clickedCheckbox(tr){
+    const selectedContactsArray = []
+    tr.classList.toggle('blue')
+    if(tr.classList == 'blue'){
+        selectedContactsArray.push(tr.id)
+    }else{
+        selectedContactsArray.filter((i)=> i !== tr.id)
+    }
+    if(selectedContactsArray.length == 0){
+        selectedContacts.innerText = ""
+        selectedContacts.className = 'dnone'
+    }else{
+        selectedContacts.innerText = `${selectedContactsArray.length} seleccionados`
+        selectedContacts.className ='selectedContacts'
+        deleteContacts.className = 'locations-buttons'
+        deleteContacts.addEventListener('click', () =>{
+            selectedContactsArray.forEach(item =>{
+                deleteRegister('contacts', +item)
+            })
+        })
+    }
+}
 const userLogin = document.getElementById('userLogin')
 const passwordLogin = document.getElementById('passwordLogin')
 const loginButton = document.getElementById('loginButton')
 const loginSection = document.getElementById('loginSection')
 const incorrectData = document.getElementById('incorrectData')
 const nav = document.getElementById('nav')
+
+if(TOKEN != null){
+    loginSection.classList.remove('fixed-window')
+    loginSection.classList.add('dnone')
+    
+    if(TOKEN.adminPrivilege == true){
+        nav.classList.remove('dnone')
+        nav.classList.add('ul-nav')
+    }else{
+        nav.classList.remove('dnone')
+        nav.classList.add('ul-nav')
+        usersLi.classList.add('dnone')
+    }
+}
 
 loginButton.addEventListener('click',async ()=>{
     const userLoginValue = userLogin.value
@@ -539,7 +594,27 @@ function openWindow(method, registerToDelete, buttonClickedId, section){
         }}
 
 }
+const editContactWindow = document.getElementById('editContactWindow')
+const editContactName = document.getElementById('editContactName')
+const editContactLastname = document.getElementById('editContactLastname')
+const editContactPosition = document.getElementById('editContactPosition')
+const editContactEmail = document.getElementById('editContactEmail')
+const editContactCompany = document.getElementById('editContactCompany')
+const editContactRegion = document.getElementById('editContactRegion')
+const editContactCountry = document.getElementById('editContactCountry')
+const editContactCity = document.getElementById('editContactCity')
 
+async function openEditWindow(item, id){
+    assignRegionToForm(editContactRegion)
+    changeCountry(editContactRegion, editContactCountry, editContactCity)
+    editContactWindow.classList.remove('dnone')
+    editContactWindow.classList.add('fixed-window')
+    editContactPosition.value = item.position
+    editContactEmail.value = item.email
+    editContactName.value = item.name
+    editContactLastname.value = item.lastname
+    editContactCompany.value = item.company
+}
 
 function openCompaniesOrUsersWindow(registerToDelete, buttonClickedId, window, section, buttonsDiv){
     window.classList.remove('dnone')
