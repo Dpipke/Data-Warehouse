@@ -6,7 +6,7 @@ async function getContacts(){
         include: {
             all: true,
             nested: true,
-        },
+        }, 
         // include:{
         //     model:City,  
         //     include: {
@@ -35,8 +35,10 @@ async function getContacts(){
     const allContacts = []
     const mappedContacts = contactsTable.forEach(item=>{
         delete item.City
+        console.log(item)
         allContacts.push(item)
     })
+    console.log(JSON.stringify(allContacts))
     return allContacts
 }
 

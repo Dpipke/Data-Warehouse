@@ -67,7 +67,8 @@ async function updateRegister(model, register){
         const setValues = setProperties.split(':')
         obj [setValues[0]] = setValues[1]
   })
-    // switch(model, set, register) {
+
+  // switch(model, set, register) {
     //     case 'Company': 
                 const companyUpdated = 
                 await Company.update({set}, {

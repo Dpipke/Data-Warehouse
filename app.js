@@ -96,7 +96,7 @@ searchLens.addEventListener('click', async ()=>{
     const response = await fetch(url, {
         method: 'GET',
         headers: {
-        Authorization: 'Bearer ' + TOKEN,
+        Authorization: 'Bearer ' + sessionStorage.getItem('userToken'),
         body: JSON.stringify({
             name: inputContactNameToSearch.value,
             lastname: inputContactLastnameToSearch.value,
@@ -166,7 +166,7 @@ async function getRegisters(liSection, path, table, model){
     const response = await fetch(url, {
         method: 'GET',
         headers: {
-        Authorization: 'Bearer ' + TOKEN,
+        Authorization: 'Bearer ' + sessionStorage.getItem('userToken'),
       },
     })
     const results = await response.json()
@@ -184,7 +184,7 @@ async function addNewRegister(path,  body, window, mainSection, successWindow, c
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + TOKEN,
+            Authorization: 'Bearer ' + sessionStorage.getItem('userToken'),
 
         },
         method: "POST",
@@ -209,7 +209,7 @@ async function deleteRegister(path, id){
     const response = await fetch(url, {
         method: "DELETE",
         headers: {
-            Authorization: 'Bearer ' + TOKEN,
+            Authorization: 'Bearer ' + sessionStorage.getItem('userToken'),
         }
     })
 
@@ -220,7 +220,7 @@ async function updateRegister(updatedInformation, path, id){
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + TOKEN,
+            Authorization: 'Bearer ' + sessionStorage.getItem('userToken'),
 
         },
         method: "PUT",
@@ -370,6 +370,7 @@ function renderTable(results, table, path, model){
     const deleteButton = document.createElement('i')
     const allButtonsDiv = document.createElement('div')
     const buttonsDiv = document.createElement('div')
+    const cityId = document.createElement('p')
     actionsButton.alt = 'action'
     actionsButton.classList = 'fas fa-ellipsis-v'
     deleteButton.alt = 'delete'
@@ -378,8 +379,11 @@ function renderTable(results, table, path, model){
     editButton.classList = 'fas fa-pen'
     buttonsDiv.classList = 'dnone'
     allButtonsDiv.classList= 'allButtons'
+    cityId.id = item.cityId
     tr.id = item.id
     delete item.id
+    delete item.cityId
+    console.log(item)
     actionsButton.addEventListener('click', () => {
         buttonsDiv.classList.remove('dnone')
         buttonsDiv.classList.add('buttonsDiv')
@@ -393,7 +397,7 @@ function renderTable(results, table, path, model){
         editButton.addEventListener('click', () => openEditCompanyWindow(item))
     }if(model == 'Company'){
         deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name , tr.id, deleteUserSection, usersSection, buttonsDiv))
-        editButton.addEventListener('click', () => openEditCompanyWindow(item, tr.id))
+        editButton.addEventListener('click', () => openEditCompanyWindow(item, tr.id, cityId))
     }
     const registerValues = Object.values(item)
     registerValues.forEach( register =>{
@@ -521,11 +525,11 @@ const loginSection = document.getElementById('loginSection')
 const incorrectData = document.getElementById('incorrectData')
 const nav = document.getElementById('nav')
 
-if(TOKEN != null){
+if(sessionStorage.getItem('userToken') != null){
     loginSection.classList.remove('fixed-window')
     loginSection.classList.add('dnone')
     
-    if(TOKEN.adminPrivilege == true){
+    if(sessionStorage.getItem('userToken').adminPrivilege == true){
         nav.classList.remove('dnone')
         nav.classList.add('ul-nav')
     }else{
@@ -543,7 +547,7 @@ loginButton.addEventListener('click',async ()=>{
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + TOKEN,
+            Authorization: 'Bearer ' + sessionStorage.getItem('userToken'),
 
         },
         method: "POST",
@@ -663,7 +667,7 @@ async function getLocations(){
     const response = await fetch(url, {
         method: 'GET',
         headers: {
-        Authorization: 'Bearer ' + TOKEN
+        Authorization: 'Bearer ' + sessionStorage.getItem('userToken')
         }})
     const results = await response.json()
     return results
@@ -673,7 +677,7 @@ async function getContactChannels(){
     const response = await fetch(url, {
         method: 'GET',
         headers: {
-        Authorization: 'Bearer ' + TOKEN
+        Authorization: 'Bearer ' + sessionStorage.getItem('userToken')
         }})
     const results = await response.json()
     return results
@@ -683,7 +687,7 @@ async function getContactPreferences(){
     const response = await fetch(url, {
         method: 'GET',
         headers: {
-        Authorization: 'Bearer ' + TOKEN
+        Authorization: 'Bearer ' + sessionStorage.getItem('userToken')
         }})
     const results = await response.json()
     return results
@@ -723,7 +727,7 @@ async function assignCompaniesToForm(selectCompany){
     const response = await fetch(url, {
         method: 'GET',
         headers: {
-        Authorization: 'Bearer ' + TOKEN,
+        Authorization: 'Bearer ' + sessionStorage.getItem('userToken'),
       },
     })
     const results = await response.json()
@@ -742,7 +746,7 @@ async function changeCountry(postRegion, postCountry, postCity){
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-            Authorization: 'Bearer ' + TOKEN
+            Authorization: 'Bearer ' + sessionStorage.getItem('userToken')
             }})
         const results = await response.json()
         results.forEach( country =>{
@@ -757,7 +761,7 @@ async function changeCountry(postRegion, postCountry, postCity){
                 const cityResponse = await fetch(cityUrl, {
                     method: 'GET',
                     headers: {
-                    Authorization: 'Bearer ' + TOKEN
+                    Authorization: 'Bearer ' + sessionStorage.getItem('userToken')
                     }})
                 const cityResults = await cityResponse.json()
                 cityResults.forEach(city =>{
@@ -809,7 +813,7 @@ const editCompanyCountry = document.getElementById('editCompanyCountry')
 const editCompanyCity = document.getElementById('editCompanyCity')
 const updateCompany = document.getElementById('updateCompany')
 
-function openEditCompanyWindow(item, id){
+function openEditCompanyWindow(item, id, cityId){
     console.log(item)
     editCompanyWindow.classList.remove('dnone')
     editCompanyWindow.classList.add('fixed-window')
@@ -819,10 +823,11 @@ function openEditCompanyWindow(item, id){
     editCompanyAddress.value = item.address
     editCompanyEmail.value = item.email
     editCompanyTelephone.value = item.telephone
+    // editCompanyCity.options[editCompanyCity.selectedIndex] = cityId
     updateCompany.addEventListener('click', ()=> updateRegister(
         {
             name: editCompanyName.value,
-            cityId:editCompanyCity.options[editCompanyCity.selectedIndex].value,
+            cityId:editCompanyCity.options[editCompanyCity.selectedIndex],
             address: editCompanyAddress.value,
             email: editCompanyEmail.value,
             telephone: editCompanyTelephone.value

@@ -47,7 +47,7 @@ main{
 .open-section{
     width: 100vw;
     margin: 5%;
-    padding-top: 3%;
+    /* padding-top: 3%; */
 }
 .locations-buttons{
     margin-bottom: 10%;
@@ -104,7 +104,6 @@ main{
     position: fixed;
     top: 7%;
     width: 90vw;
-    /* height: 80vh; */
     background: rgba(255,255,255,1);
     z-index: 1;
     display: flex;
@@ -261,6 +260,9 @@ input{
 .fa-search{
     position: absolute;
     left: 47vw;
+    border: 1px solid #CCCCCC;
+    border-radius: 6px;
+    padding: 0.6%;
 }
 
 .warning{
@@ -287,4 +289,14 @@ input{
 .eachFieldest{
     display: flex;
     align-items: center;
+}
+.login{
+    max-width: 60vw;
+    right: 20%;
+}
+.contactOptions{
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    margin-right: 10%;
 }

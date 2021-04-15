@@ -267,7 +267,7 @@ app.delete('/cities/:id', async (req, res)=>{
 // companies
 app.get('/companies', async (req, res)=>{
     const allCompanies = await getAllRegisters('Company')
-    const mappedCompanies = allCompanies.map(item=> Object.assign({id: item.id, name: item.name, address: item.address, email: item.email, telephone: item.telephone, city: item.City.name, country: item.City.Country.name, region: item.City.Country.Region.name }) )
+    const mappedCompanies = allCompanies.map(item=> Object.assign({id: item.id, name: item.name, address: item.address, email: item.email, telephone: item.telephone, cityId:item.CityId, city: item.City.name, country: item.City.Country.name, region: item.City.Country.Region.name }) )
     res.status(200).json(mappedCompanies)
 
 })
@@ -283,6 +283,7 @@ app.post('/companies', async (req, res)=>{
     addNewRegister('Company', newCompany)
 })
 app.put('/companies/:id', async (req, res)=>{
+    console.log(req.body)
     const companyToUpdate ={
         id: req.params.id,
         name: req.body.name,
