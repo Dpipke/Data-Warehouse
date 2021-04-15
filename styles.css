@@ -5,7 +5,7 @@ body{
     margin: 0 auto;
     padding: 0;
     height: 100vh;
-    max-width: 100vw;
+    /* max-width: 100vw; */
 }
 
 header{
@@ -104,7 +104,7 @@ main{
     position: fixed;
     top: 7%;
     width: 90vw;
-    height: 80vh;
+    /* height: 80vh; */
     background: rgba(255,255,255,1);
     z-index: 1;
     display: flex;
@@ -277,4 +277,14 @@ input{
 }
 .chosenContacts{
     
+}
+
+.addContactChannelFieldset{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+}
+.eachFieldest{
+    display: flex;
+    align-items: center;
 }

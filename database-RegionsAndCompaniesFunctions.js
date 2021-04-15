@@ -61,7 +61,6 @@ async function getAllRegisters(model, id){
 
 async function updateRegister(model, register){
     const set = Object.keys(register).filter(key => register[key] != null && key != "id").map(key => `${key} : ${JSON.stringify(register[key])}`).join(",")
-    console.log(set)
     const setProperties = set.split(',')
     const obj = {}
     setProperties.forEach(function(setProperties){

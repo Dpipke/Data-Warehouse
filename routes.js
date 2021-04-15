@@ -22,7 +22,9 @@ const {getContacts,
     getContactChannels,
     getContactPreferences,
     deleteContact,
-    searchContacts
+    searchContacts,
+    createContact,
+    addContactChannel
     }= require('./database-ContactFunctions')
 
 
@@ -280,9 +282,9 @@ app.post('/companies', async (req, res)=>{
     }
     addNewRegister('Company', newCompany)
 })
-app.put('/companies', async (req, res)=>{
+app.put('/companies/:id', async (req, res)=>{
     const companyToUpdate ={
-        id: req.body.id,
+        id: req.params.id,
         name: req.body.name,
         cityId: req.body.cityId,
         address: req.body.address,
@@ -301,6 +303,7 @@ app.get('/contacts', async(req, res)=>{
     const allContacts = await getContacts()
     const contacts = []
     const mappedContacts = allContacts.forEach(item => {
+        console.log(item)
         const eachContact = Object.assign({id: item.id, name: item.name, lastname: item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest})
         const favoriteChannels = allContacts.map(element => {
             if(item.id == element.id){
@@ -319,8 +322,11 @@ app.get('/contacts', async(req, res)=>{
 })
 
 app.post('/contacts', async(req, res)=>{
-    
-})
+    console.log(req.body.body)
+    const createdContact = await createContact(req.body.body)
+    const createdChannels = await addContactChannel(req.body.body, createdContact)
+    res.status(201).send()
+}) 
 
 app.delete('/contacts/:id', async(req, res)=>{
     const contactId = req.params.id

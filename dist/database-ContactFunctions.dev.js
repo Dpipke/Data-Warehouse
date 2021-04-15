@@ -25,7 +25,7 @@ var _require2 = require('./database-models'),
     Region = _require2.Region;
 
 function getContacts() {
-  var contactsTable;
+  var contactsTable, allContacts, mappedContacts;
   return regeneratorRuntime.async(function getContacts$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -62,9 +62,15 @@ function getContacts() {
 
         case 2:
           contactsTable = _context.sent;
-          return _context.abrupt("return", contactsTable);
+          // const contacts = JSON.stringify(contactsTable)
+          allContacts = [];
+          mappedContacts = contactsTable.forEach(function (item) {
+            delete item.City;
+            allContacts.push(item);
+          });
+          return _context.abrupt("return", allContacts);
 
-        case 4:
+        case 6:
         case "end":
           return _context.stop();
       }
@@ -173,10 +179,79 @@ function searchContacts(register) {
   });
 }
 
+function createContact(data) {
+  var contact;
+  return regeneratorRuntime.async(function createContact$(_context6) {
+    while (1) {
+      switch (_context6.prev = _context6.next) {
+        case 0:
+          _context6.next = 2;
+          return regeneratorRuntime.awrap(Contact.create({
+            name: data.name,
+            lastname: data.lastname,
+            position: data.position,
+            CompanyId: data.companyId,
+            email: data.email,
+            address: data.address,
+            interest: data.interest,
+            CityId: data.cityId
+          }));
+
+        case 2:
+          contact = _context6.sent;
+          return _context6.abrupt("return", contact.id);
+
+        case 4:
+        case "end":
+          return _context6.stop();
+      }
+    }
+  });
+}
+
+function addContactChannel(data, id) {
+  return regeneratorRuntime.async(function addContactChannel$(_context8) {
+    while (1) {
+      switch (_context8.prev = _context8.next) {
+        case 0:
+          data.contactChannels.forEach(function _callee(item) {
+            var contactChannel;
+            return regeneratorRuntime.async(function _callee$(_context7) {
+              while (1) {
+                switch (_context7.prev = _context7.next) {
+                  case 0:
+                    _context7.next = 2;
+                    return regeneratorRuntime.awrap(ContactChannel.create({
+                      contactId: id,
+                      contactChannelSocialMediaId: +item.ContactChannel,
+                      user_account: item.userAccount
+                    }));
+
+                  case 2:
+                    contactChannel = _context7.sent;
+
+                  case 3:
+                  case "end":
+                    return _context7.stop();
+                }
+              }
+            });
+          });
+
+        case 1:
+        case "end":
+          return _context8.stop();
+      }
+    }
+  });
+}
+
 module.exports = {
   getContacts: getContacts,
   getContactChannels: getContactChannels,
   getContactPreferences: getContactPreferences,
   deleteContact: deleteContact,
-  searchContacts: searchContacts
+  searchContacts: searchContacts,
+  createContact: createContact,
+  addContactChannel: addContactChannel
 };

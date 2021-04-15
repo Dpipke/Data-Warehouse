@@ -117,7 +117,6 @@ function updateRegister(model, register) {
           }).map(function (key) {
             return "".concat(key, " : ").concat(JSON.stringify(register[key]));
           }).join(",");
-          console.log(set);
           setProperties = set.split(',');
           obj = {};
           setProperties.forEach(function (setProperties) {
@@ -126,7 +125,7 @@ function updateRegister(model, register) {
           }); // switch(model, set, register) {
           //     case 'Company': 
 
-          _context2.next = 7;
+          _context2.next = 6;
           return regeneratorRuntime.awrap(Company.update({
             set: set
           }, {
@@ -135,12 +134,12 @@ function updateRegister(model, register) {
             }
           }));
 
-        case 7:
+        case 6:
           companyUpdated = _context2.sent;
           console.log(companyUpdated);
           return _context2.abrupt("return", companyUpdated);
 
-        case 10:
+        case 9:
         case "end":
           return _context2.stop();
       }

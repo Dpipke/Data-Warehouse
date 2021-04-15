@@ -34,7 +34,9 @@ var _require3 = require('./database-ContactFunctions'),
     getContactChannels = _require3.getContactChannels,
     getContactPreferences = _require3.getContactPreferences,
     deleteContact = _require3.deleteContact,
-    searchContacts = _require3.searchContacts;
+    searchContacts = _require3.searchContacts,
+    createContact = _require3.createContact,
+    addContactChannel = _require3.addContactChannel;
 
 app.use(bodyParser.json());
 app.use(helmet());
@@ -631,14 +633,14 @@ app.post('/companies', function _callee23(req, res) {
     }
   });
 });
-app.put('/companies', function _callee24(req, res) {
+app.put('/companies/:id', function _callee24(req, res) {
   var companyToUpdate, updatedCompany;
   return regeneratorRuntime.async(function _callee24$(_context24) {
     while (1) {
       switch (_context24.prev = _context24.next) {
         case 0:
           companyToUpdate = {
-            id: req.body.id,
+            id: req.params.id,
             name: req.body.name,
             cityId: req.body.cityId,
             address: req.body.address,
@@ -688,6 +690,7 @@ app.get('/contacts', function _callee26(req, res) {
           allContacts = _context26.sent;
           contacts = [];
           mappedContacts = allContacts.forEach(function (item) {
+            console.log(item);
             var eachContact = Object.assign({
               id: item.id,
               name: item.name,
@@ -724,10 +727,25 @@ app.get('/contacts', function _callee26(req, res) {
   });
 });
 app.post('/contacts', function _callee27(req, res) {
+  var createdContact, createdChannels;
   return regeneratorRuntime.async(function _callee27$(_context27) {
     while (1) {
       switch (_context27.prev = _context27.next) {
         case 0:
+          console.log(req.body.body);
+          _context27.next = 3;
+          return regeneratorRuntime.awrap(createContact(req.body.body));
+
+        case 3:
+          createdContact = _context27.sent;
+          _context27.next = 6;
+          return regeneratorRuntime.awrap(addContactChannel(req.body.body, createdContact));
+
+        case 6:
+          createdChannels = _context27.sent;
+          res.status(201).send();
+
+        case 8:
         case "end":
           return _context27.stop();
       }

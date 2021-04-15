@@ -19,7 +19,8 @@
             </ul>
         </nav>
     </header>
-    <main>
+    <main id="mainSection">
+        <!-- login -->
         <section class="fixed-window" id="loginSection">
             <div class="header-section"></div>
             <h1>Bienvenido</h1>
@@ -28,6 +29,8 @@
             <p class="dnone" id="incorrectData">Usuario o Contraseña incorrecta</p>
             <p class="locations-buttons" id="loginButton">Ingresar </p>
         </section>
+
+        <!-- contacts section -->
         <section class="dnone" id="contacts-section">
             <div class="contactsHeader">
                 <div class="searchDiv">
@@ -140,29 +143,14 @@
                             </select>
                         </label>
                     </fieldset>
-                    <fieldset>
-                        <label for="contactChannel">
-                            <p>Canal de contacto</p>
-                            <select name="contactChannel" required id="postContactChannel">
-                                <option value="-"></option>
-                            </select>                        
-                        </label>
-                        <label for="userAccount">
-                            <p>Cuenta de Usuario</p>
-                            <input type="text" name="userAccount" id="inputContactAddress">
-                        </label>
-                        <label for="contactPreference">
-                            <p>Preferencias</p>
-                            <select name="contactPreference" required id="postContactPreference">
-                                <option value="-"></option>
-                            </select>                        
-                        </label>
-                    </fieldset>
-                </form>
-                <div class="buttons">
-                    <p class="locations-buttons cancelAddRegister" id="cancelAddCompany">Cancelar</p>
-                    <p class="locations-buttons addRegisterButton" id="addContact">Agregar Contacto</p>
-                </div>
+                    <fieldset id="addContactChannelFieldset">
+                        </fieldset>
+                    </form>
+                            <div class="buttons">
+                                <p class="locations-buttons cancelAddRegister" id="cancelAddCompany">Cancelar</p>
+                                <p class="locations-buttons addRegisterButton" id="addContact">Agregar Contacto</p>
+                            </div>
+                        </div>
             </div>
             <div class="dnone" id="delete-contact">
                 <div class="header-section"></div>
@@ -251,9 +239,8 @@
                     <p class="locations-buttons addRegisterButton" id="addContact">Agregar Contacto</p>
                 </div>
             </div>
-
-
         </section>
+        <!-- regions section -->
         <section class='dnone' id="region-section">
             <div class='dnone' id="add-location">
                 <div class="header-section"></div>
@@ -282,6 +269,7 @@
                 </div>
             </div>
         </section>
+        <!-- companies section -->
         <section class="dnone" id="company-section">
             <p class="locations-buttons addRegister" id="addCompanyButton-openWindow">Agregar Compañía</p>
             <table id='company-table'>
@@ -343,7 +331,66 @@
                     <p class="locations-buttons addRegisterButton" id="addCompanyButton">Agregar Compañía</p>
                 </div>
             </div>
+            <div class="dnone" id="deleteCompanySection">
+                <div class="header-section"></div>
+                <p>¿Esta seguro que desea eliminar </p><p id="companyToDelete"></p>
+                <div class="deleteButtons">
+                    <p class="locations-buttons cancelDeleteRegister" id="cancelDeleteUser">Cancelar</p>
+                    <p class="locations-buttons confirmDeleteRegister" id="deleteContactButton">Eliminar</p>    
+                </div>
+            </div>
+            <div class="dnone" id="editCompanyWindow">
+                <div class="header-section headerCompany">
+                    <h2>Editar Compañía</h2>
+                </div>
+                <form action="post" class="addContactForm">
+                    <fieldset class="registerFieldset">
+                        <label for="name">
+                            <p>Nombre</p>
+                            <input type="text" name="name" id="editCompanyName">
+                        </label>
+                        <label for="address">
+                            <p>Dirección</p>
+                            <input type="text" name="address" id="editCompanyAddress">
+                        </label>
+                        <label for="email">
+                            <p>Email</p>
+                            <input type="text" name="email" id="editCompanyEmail">
+                        </label>
+                        <label for="telephone">
+                            <p>Teléfono</p>
+                            <input type="text" name="telephone" id="editCompanyTelephone">
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="region">
+                            <p>Región</p>
+                            <select name="region" required id="editCompanyRegion">
+                                <option value="">Seleccione...</option>
+                            </select>                        
+                        </label>
+                        <label for="country">
+                            <p>País</p>
+                            <select name="country" required id="editCompanyCountry">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </label>
+                        <label for="city">
+                            <p>Ciudad</p>
+                            <select name="city" required id="editCompanyCity">
+                                <option value="">Seleccione...</option>
+                            </select>
+                        </label>
+                    </fieldset>
+                   
+                </form>
+                <div class="buttons">
+                    <p class="locations-buttons cancelAddRegister" id="cancelUpdateCompany">Cancelar</p>
+                    <p class="locations-buttons addRegisterButton" id="updateCompany">Modificar información</p>
+                </div>
+            </div>
         </section>
+        <!-- users section -->
         <section class="dnone" id="users-section">
             <p class="locations-buttons addRegister" id="addUserButton-openWindow">Agregar Usuario</p>
             <table id='users-table'>

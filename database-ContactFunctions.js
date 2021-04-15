@@ -31,9 +31,13 @@ async function getContacts(){
         // }
     },
         );
-    // const allContacts = JSON.stringify(contactsTable)
-    // console.log(allContacts)
-    return contactsTable
+    // const contacts = JSON.stringify(contactsTable)
+    const allContacts = []
+    const mappedContacts = contactsTable.forEach(item=>{
+        delete item.City
+        allContacts.push(item)
+    })
+    return allContacts
 }
 
 async function getContactChannels(){
@@ -64,4 +68,14 @@ async function searchContacts(register){
     return contactsSearch
 
 }
-module.exports = {getContacts, getContactChannels, getContactPreferences, deleteContact, searchContacts}
+async function createContact(data){
+    const contact = await Contact.create({name: data.name, lastname: data.lastname, position: data.position, CompanyId: data.companyId, email: data.email, address: data.address, interest: data.interest, CityId: data.cityId});
+    return contact.id
+}
+
+async function addContactChannel(data, id){
+    data.contactChannels.forEach(async (item) => {
+        const contactChannel = await ContactChannel.create({contactId: id, contactChannelSocialMediaId: +item.ContactChannel, user_account: item.userAccount})
+    })
+}
+module.exports = {getContacts, getContactChannels, getContactPreferences, deleteContact, searchContacts, createContact, addContactChannel}

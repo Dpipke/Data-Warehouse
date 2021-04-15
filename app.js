@@ -1,3 +1,4 @@
+const mainSection = document.getElementById('mainSection')
 const contactsLi = document.getElementById('contacts-li')
 const usersLi = document.getElementById('users-li')
 const companyLi = document.getElementById('company-li')
@@ -48,6 +49,8 @@ const postContactCountry = document.getElementById('postContactCountry')
 const postContactCity = document.getElementById('postContactCity')
 const postContactChannel = document.getElementById('postContactChannel')
 const postContactPreference = document.getElementById('postContactPreference')
+const inputContactChannelUsername = document.getElementById('inputContactChannelUsername')
+const addChannelBtn = document.getElementById('addChannelBtn')
 
 const inputCompanyName = document.getElementById('inputCompanyName')
 const inputCompanyAddress = document.getElementById('inputCompanyAddress')
@@ -60,7 +63,6 @@ const inputContactName = document.getElementById('inputContactName')
 const inputContactLastname = document.getElementById('inputContactLastname')
 const inputContactPosition = document.getElementById('inputContactPosition')
 const inputContactEmail = document.getElementById('inputContactEmail')
-const inputContactCity = document.getElementById('inputContactCity')
 const inputContactAddress = document.getElementById('inputContactAddress')
 const inputContactCompany = document.getElementById('inputContactCompany')
 const tbodyContact = document.getElementById('tbodyContact')
@@ -99,7 +101,6 @@ searchLens.addEventListener('click', async ()=>{
             name: inputContactNameToSearch.value,
             lastname: inputContactLastnameToSearch.value,
             position: inputContactPositionToSearch.value,
-            // location: inputContactLocationToSearch.options[inputContactLocationToSearch.selectedIndex].value,
             company: inputContactCompanyToSearch.options[inputContactCompanyToSearch.selectedIndex].value
         })
     },
@@ -110,7 +111,10 @@ searchLens.addEventListener('click', async ()=>{
 
 } )
 
-addContactButton.addEventListener('click',()=>openAddButton('contacts', null,addContactWindow ) )
+addContactButton.addEventListener('click',()=> {
+    openAddButton('contacts', null,addContactWindow)
+    renderContactChannels()
+} )
 addCompanyButton.addEventListener('click', ()=>openAddButton('companies', null,addCompanyWindow ))
 cancelAddCompany.addEventListener('click', ()=> closeWindow(addCompanyWindow, regionSection))
 addCompanyToDBButton.addEventListener('click', ()=>addNewRegister(
@@ -153,6 +157,7 @@ function openLi(model, liSection, path, table){
         liSection.classList.add('open-section')
     getRegisters(liSection, path, table, model)
     }else{
+        liSection.classList.remove('open-section')
         liSection.classList.add('dnone')
     }
 }
@@ -169,12 +174,11 @@ async function getRegisters(liSection, path, table, model){
         renderRegions(results, liSection)
     }if(liSection === contactsSection){
         renderContacts(results)
-    }else{
+    }if(liSection === usersSection || liSection === companySection){
         renderTable(results, table, path, model ) 
     }
 }
 async function addNewRegister(path,  body, window, mainSection, successWindow, closeButton){
-    console.log(body)
     const url = `http://localhost:3010/${path}`
     const response = await fetch(url,{
         headers: {
@@ -212,7 +216,6 @@ async function deleteRegister(path, id){
 }
 async function updateRegister(updatedInformation, path, id){
     const url = `http://localhost:3010/${path}/${id}`
-    console.log(url)
     const response = await fetch(url,{
         headers: {
             'Accept': 'application/json',
@@ -321,7 +324,6 @@ function renderContacts(results){
         tr.id = item.id
         delete item.id
         checkbox.addEventListener('click', () => {
-            console.log(tr)
             clickedCheckbox(tr)})
         actionsButton.addEventListener('click', () => {
             buttonsDiv.classList.remove('dnone')
@@ -331,7 +333,7 @@ function renderContacts(results){
         buttonsDiv.appendChild(deleteButton)
         allButtonsDiv.appendChild(actionsButton)
         allButtonsDiv.appendChild(buttonsDiv)
-        editButton.addEventListener('click', () => openEditWindow(item, tr.id, item.name, item.lastname))
+        editButton.addEventListener('click', () => openEditContactWindow(item, tr.id, item.name, item.lastname))
         deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name+" "+ item.lastname , tr.id, deleteContactSection, contactsSection, buttonsDiv))
         const registerValues = Object.values(item)
         const tdNameAndEmail = document.createElement('td')
@@ -362,7 +364,6 @@ function renderContacts(results){
 }
 function renderTable(results, table, path, model){
     results.forEach(item => {
-    console.log(item)
     const tr = document.createElement('tr')
     const actionsButton = document.createElement('i')
     const editButton = document.createElement('i')
@@ -387,8 +388,13 @@ function renderTable(results, table, path, model){
     buttonsDiv.appendChild(deleteButton)
     allButtonsDiv.appendChild(actionsButton)
     allButtonsDiv.appendChild(buttonsDiv)
-    deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.fullname , tr.id, deleteUserSection, usersSection, buttonsDiv))
-    editButton.addEventListener('click', () => openEditWindow())
+    if(model == 'User'){
+        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.fullname , tr.id, deleteUserSection, usersSection, buttonsDiv))
+        editButton.addEventListener('click', () => openEditCompanyWindow(item))
+    }if(model == 'Company'){
+        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name , tr.id, deleteUserSection, usersSection, buttonsDiv))
+        editButton.addEventListener('click', () => openEditCompanyWindow(item, tr.id))
+    }
     const registerValues = Object.values(item)
     registerValues.forEach( register =>{
         const td = document.createElement('td')
@@ -432,22 +438,36 @@ async function openAddButton(model, modelDependentOnId, window){
             name: newLocation.value
         }))
         if(window == addContactWindow){
-            console.log('si')
             assignRegionToForm(postContactRegion)
             changeCountry(postContactRegion, postContactCountry, postContactCity)
-            assignContactChannelsToForm()
-            assignContactPreferencesToForm()
             assignCompaniesToForm(inputContactCompany)
-            addContact.addEventListener('click', ()=> addNewRegister('contacts', {
+            const input = document.getElementsByName('userAccountName')
+            const contactChannels = []
+            addContact.addEventListener('click', ()=> {
+                input.forEach(item=>{
+                    const preference = document.getElementsByName(item.id)
+                    console.log(preference[0].options.selectedIndex)
+                    if(item.value != ""){
+                    const eachCC =  { ContactChannel: item.id,
+                                    userAccount:item.value,
+                                    preference: preference[0].options.selectedIndex
+                                }
+                    contactChannels.push(eachCC)
+                    }
+                })
+                addNewRegister('contacts', {
                 name: inputContactName.value,
                 lastname: inputContactLastname.value,
                 position: inputContactPosition.value,
                 companyId: inputContactCompany.options[inputContactCompany.selectedIndex].value,
                 email: inputContactEmail.value,
-                cityId: inputContactCity.value,
+                cityId: postContactCity.value,
                 address: inputContactAddress.value,
-
-            }))
+                interest: progressInterest.value,
+                contactChannels: contactChannels},
+                addContactWindow,
+                contactsSection)
+        })
         }
         if(postUserPassword.value==postUserRepeatPassword.value){
         addUserButton.addEventListener('click', () => {
@@ -546,7 +566,7 @@ async function sessionLogin(response){
     console.log(response)
     sessionStorage.setItem('userToken', response.userToken)
     // const myHeaders = new Headers()
-    // myHeaders.append('authorization', `Bearer ${response.userToken}`);
+    // myHeaders.append('Authorization', `Bearer ${response.userToken}`);
 
     if(response.adminPrivilege == true){
         nav.classList.remove('dnone')
@@ -563,8 +583,7 @@ function openWindow(method, registerToDelete, buttonClickedId, section){
     const model = buttonClickedId.split(' ')[0]
     const placeId = buttonClickedId.split(' ')[1]
     locationToDelete.innerText = registerToDelete +'?'
-    console.log(model)
-    console.log(placeId)
+
     if(method == 'update'){
         switch(model){
             case 'Region':
@@ -604,7 +623,7 @@ const editContactRegion = document.getElementById('editContactRegion')
 const editContactCountry = document.getElementById('editContactCountry')
 const editContactCity = document.getElementById('editContactCity')
 
-async function openEditWindow(item, id){
+async function openEditContactWindow(item, id){
     assignRegionToForm(editContactRegion)
     changeCountry(editContactRegion, editContactCountry, editContactCity)
     editContactWindow.classList.remove('dnone')
@@ -679,26 +698,24 @@ async function assignRegionToForm(postRegion){
         postRegion.appendChild(option)
 })
 }
-async function assignContactChannelsToForm(){
+async function assignContactChannelsToForm(postChannel){
     const allContactChannels = await getContactChannels()
-    console.log(allContactChannels)
     allContactChannels.forEach( contact =>{
         const option = document.createElement('option')
         option.innerText = contact.name
         option.id = contact.id
         option.value = contact.id
-        postContactChannel.appendChild(option)
+        postChannel.appendChild(option)
 })
 }
-async function assignContactPreferencesToForm(){
+async function assignContactPreferencesToForm(postPreference){
     const allContactPreferences = await getContactPreferences()
-    console.log(allContactPreferences)
     allContactPreferences.forEach( contact =>{
         const option = document.createElement('option')
         option.innerText = contact.name
         option.id = contact.id
         option.value = contact.id
-        postContactPreference.appendChild(option)
+        postPreference.appendChild(option)
 })
 }
 async function assignCompaniesToForm(selectCompany){
@@ -743,7 +760,6 @@ async function changeCountry(postRegion, postCountry, postCity){
                     Authorization: 'Bearer ' + TOKEN
                     }})
                 const cityResults = await cityResponse.json()
-                console.log(cityResults)
                 cityResults.forEach(city =>{
                     const option = document.createElement('option')
                     option.innerText = city.cityName
@@ -753,3 +769,64 @@ async function changeCountry(postRegion, postCountry, postCity){
                 })
             })
 })})}
+
+const addContactChannelFieldset = document.getElementById('addContactChannelFieldset')
+
+async function renderContactChannels(){
+    const allContactChannels = await getContactChannels()
+    allContactChannels.forEach(item =>{
+        const div = document.createElement('div')
+        const labelUserAccount = document.createElement('label')
+        const labelPreferences = document.createElement('label')
+        const inputUserAccount = document.createElement('input')
+        const selectPreferences = document.createElement('select')
+        const optionPreferences = document.createElement('option')
+        const p =  document.createElement('p')
+        p.innerText = item.name
+        optionPreferences.innerText = " "
+        inputUserAccount.name = 'userAccountName'
+        inputUserAccount.id = item.id
+        selectPreferences.name = item.id
+        selectPreferences.appendChild(optionPreferences)
+        assignContactPreferencesToForm(selectPreferences)
+        labelPreferences.appendChild(selectPreferences)
+        labelUserAccount.appendChild(p)
+        labelUserAccount.appendChild(inputUserAccount)
+        div.appendChild(labelUserAccount)
+        div.appendChild(labelPreferences)
+        addContactChannelFieldset.appendChild(div)
+
+    })
+}
+
+const editCompanyWindow = document.getElementById('editCompanyWindow')
+const editCompanyName = document.getElementById('editCompanyName')
+const editCompanyAddress = document.getElementById('editCompanyAddress')
+const editCompanyEmail = document.getElementById('editCompanyEmail')
+const editCompanyTelephone = document.getElementById('editCompanyTelephone')
+const editCompanyRegion = document.getElementById('editCompanyRegion')
+const editCompanyCountry = document.getElementById('editCompanyCountry')
+const editCompanyCity = document.getElementById('editCompanyCity')
+const updateCompany = document.getElementById('updateCompany')
+
+function openEditCompanyWindow(item, id){
+    console.log(item)
+    editCompanyWindow.classList.remove('dnone')
+    editCompanyWindow.classList.add('fixed-window')
+    assignRegionToForm(editCompanyRegion)
+    changeCountry(editCompanyRegion, editCompanyCountry, editCompanyCity)
+    editCompanyName.value = item.name
+    editCompanyAddress.value = item.address
+    editCompanyEmail.value = item.email
+    editCompanyTelephone.value = item.telephone
+    updateCompany.addEventListener('click', ()=> updateRegister(
+        {
+            name: editCompanyName.value,
+            cityId:editCompanyCity.options[editCompanyCity.selectedIndex].value,
+            address: editCompanyAddress.value,
+            email: editCompanyEmail.value,
+            telephone: editCompanyTelephone.value
+        },
+         'companies', id) )
+    
+}

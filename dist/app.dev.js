@@ -1,5 +1,6 @@
 "use strict";
 
+var mainSection = document.getElementById('mainSection');
 var contactsLi = document.getElementById('contacts-li');
 var usersLi = document.getElementById('users-li');
 var companyLi = document.getElementById('company-li');
@@ -56,6 +57,8 @@ var postContactCountry = document.getElementById('postContactCountry');
 var postContactCity = document.getElementById('postContactCity');
 var postContactChannel = document.getElementById('postContactChannel');
 var postContactPreference = document.getElementById('postContactPreference');
+var inputContactChannelUsername = document.getElementById('inputContactChannelUsername');
+var addChannelBtn = document.getElementById('addChannelBtn');
 var inputCompanyName = document.getElementById('inputCompanyName');
 var inputCompanyAddress = document.getElementById('inputCompanyAddress');
 var inputCompanyEmail = document.getElementById('inputCompanyEmail');
@@ -66,7 +69,6 @@ var inputContactName = document.getElementById('inputContactName');
 var inputContactLastname = document.getElementById('inputContactLastname');
 var inputContactPosition = document.getElementById('inputContactPosition');
 var inputContactEmail = document.getElementById('inputContactEmail');
-var inputContactCity = document.getElementById('inputContactCity');
 var inputContactAddress = document.getElementById('inputContactAddress');
 var inputContactCompany = document.getElementById('inputContactCompany');
 var tbodyContact = document.getElementById('tbodyContact');
@@ -104,7 +106,6 @@ searchLens.addEventListener('click', function _callee() {
                 name: inputContactNameToSearch.value,
                 lastname: inputContactLastnameToSearch.value,
                 position: inputContactPositionToSearch.value,
-                // location: inputContactLocationToSearch.options[inputContactLocationToSearch.selectedIndex].value,
                 company: inputContactCompanyToSearch.options[inputContactCompanyToSearch.selectedIndex].value
               })
             }
@@ -128,7 +129,8 @@ searchLens.addEventListener('click', function _callee() {
   });
 });
 addContactButton.addEventListener('click', function () {
-  return openAddButton('contacts', null, addContactWindow);
+  openAddButton('contacts', null, addContactWindow);
+  renderContactChannels();
 });
 addCompanyButton.addEventListener('click', function () {
   return openAddButton('companies', null, addCompanyWindow);
@@ -175,6 +177,7 @@ function openLi(model, liSection, path, table) {
     liSection.classList.add('open-section');
     getRegisters(liSection, path, table, model);
   } else {
+    liSection.classList.remove('open-section');
     liSection.classList.add('dnone');
   }
 }
@@ -208,11 +211,13 @@ function getRegisters(liSection, path, table, model) {
 
           if (liSection === contactsSection) {
             renderContacts(results);
-          } else {
+          }
+
+          if (liSection === usersSection || liSection === companySection) {
             renderTable(results, table, path, model);
           }
 
-        case 9:
+        case 10:
         case "end":
           return _context2.stop();
       }
@@ -226,9 +231,8 @@ function addNewRegister(path, body, window, mainSection, successWindow, closeBut
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
-          console.log(body);
           url = "http://localhost:3010/".concat(path);
-          _context3.next = 4;
+          _context3.next = 3;
           return regeneratorRuntime.awrap(fetch(url, {
             headers: {
               'Accept': 'application/json',
@@ -241,12 +245,12 @@ function addNewRegister(path, body, window, mainSection, successWindow, closeBut
             })
           }));
 
-        case 4:
+        case 3:
           response = _context3.sent;
-          _context3.next = 7;
+          _context3.next = 6;
           return regeneratorRuntime.awrap(response.status);
 
-        case 7:
+        case 6:
           resultsStatus = _context3.sent;
 
           if (resultsStatus === 201) {
@@ -260,7 +264,7 @@ function addNewRegister(path, body, window, mainSection, successWindow, closeBut
             });
           }
 
-        case 9:
+        case 8:
         case "end":
           return _context3.stop();
       }
@@ -301,8 +305,7 @@ function updateRegister(updatedInformation, path, id) {
       switch (_context5.prev = _context5.next) {
         case 0:
           url = "http://localhost:3010/".concat(path, "/").concat(id);
-          console.log(url);
-          _context5.next = 4;
+          _context5.next = 3;
           return regeneratorRuntime.awrap(fetch(url, {
             headers: {
               'Accept': 'application/json',
@@ -315,10 +318,10 @@ function updateRegister(updatedInformation, path, id) {
             })
           }));
 
-        case 4:
+        case 3:
           response = _context5.sent;
 
-        case 5:
+        case 4:
         case "end":
           return _context5.stop();
       }
@@ -436,7 +439,6 @@ function renderContacts(results) {
     tr.id = item.id;
     delete item.id;
     checkbox.addEventListener('click', function () {
-      console.log(tr);
       clickedCheckbox(tr);
     });
     actionsButton.addEventListener('click', function () {
@@ -448,7 +450,7 @@ function renderContacts(results) {
     allButtonsDiv.appendChild(actionsButton);
     allButtonsDiv.appendChild(buttonsDiv);
     editButton.addEventListener('click', function () {
-      return openEditWindow(item, tr.id, item.name, item.lastname);
+      return openEditContactWindow(item, tr.id, item.name, item.lastname);
     });
     deleteButton.addEventListener('click', function () {
       return openCompaniesOrUsersWindow(item.name + " " + item.lastname, tr.id, deleteContactSection, contactsSection, buttonsDiv);
@@ -481,7 +483,6 @@ function renderContacts(results) {
 
 function renderTable(results, table, path, model) {
   results.forEach(function (item) {
-    console.log(item);
     var tr = document.createElement('tr');
     var actionsButton = document.createElement('i');
     var editButton = document.createElement('i');
@@ -506,12 +507,25 @@ function renderTable(results, table, path, model) {
     buttonsDiv.appendChild(deleteButton);
     allButtonsDiv.appendChild(actionsButton);
     allButtonsDiv.appendChild(buttonsDiv);
-    deleteButton.addEventListener('click', function () {
-      return openCompaniesOrUsersWindow(item.fullname, tr.id, deleteUserSection, usersSection, buttonsDiv);
-    });
-    editButton.addEventListener('click', function () {
-      return openEditWindow();
-    });
+
+    if (model == 'User') {
+      deleteButton.addEventListener('click', function () {
+        return openCompaniesOrUsersWindow(item.fullname, tr.id, deleteUserSection, usersSection, buttonsDiv);
+      });
+      editButton.addEventListener('click', function () {
+        return openEditCompanyWindow(item);
+      });
+    }
+
+    if (model == 'Company') {
+      deleteButton.addEventListener('click', function () {
+        return openCompaniesOrUsersWindow(item.name, tr.id, deleteUserSection, usersSection, buttonsDiv);
+      });
+      editButton.addEventListener('click', function () {
+        return openEditCompanyWindow(item, tr.id);
+      });
+    }
+
     var registerValues = Object.values(item);
     registerValues.forEach(function (register) {
       var td = document.createElement('td');
@@ -524,7 +538,7 @@ function renderTable(results, table, path, model) {
 }
 
 function openAddButton(model, modelDependentOnId, window) {
-  var id, modelDependentOn, locationBody;
+  var id, modelDependentOn, locationBody, input, contactChannels;
   return regeneratorRuntime.async(function openAddButton$(_context6) {
     while (1) {
       switch (_context6.prev = _context6.next) {
@@ -571,22 +585,36 @@ function openAddButton(model, modelDependentOnId, window) {
             });
 
             if (window == addContactWindow) {
-              console.log('si');
               assignRegionToForm(postContactRegion);
               changeCountry(postContactRegion, postContactCountry, postContactCity);
-              assignContactChannelsToForm();
-              assignContactPreferencesToForm();
               assignCompaniesToForm(inputContactCompany);
+              input = document.getElementsByName('userAccountName');
+              contactChannels = [];
               addContact.addEventListener('click', function () {
-                return addNewRegister('contacts', {
+                input.forEach(function (item) {
+                  var preference = document.getElementsByName(item.id);
+                  console.log(preference[0].options.selectedIndex);
+
+                  if (item.value != "") {
+                    var eachCC = {
+                      ContactChannel: item.id,
+                      userAccount: item.value,
+                      preference: preference[0].options.selectedIndex
+                    };
+                    contactChannels.push(eachCC);
+                  }
+                });
+                addNewRegister('contacts', {
                   name: inputContactName.value,
                   lastname: inputContactLastname.value,
                   position: inputContactPosition.value,
                   companyId: inputContactCompany.options[inputContactCompany.selectedIndex].value,
                   email: inputContactEmail.value,
-                  cityId: inputContactCity.value,
-                  address: inputContactAddress.value
-                });
+                  cityId: postContactCity.value,
+                  address: inputContactAddress.value,
+                  interest: progressInterest.value,
+                  contactChannels: contactChannels
+                }, addContactWindow, contactsSection);
               });
             }
 
@@ -697,7 +725,7 @@ loginButton.addEventListener('click', function _callee2() {
                   case 0:
                     console.log(response);
                     sessionStorage.setItem('userToken', response.userToken); // const myHeaders = new Headers()
-                    // myHeaders.append('authorization', `Bearer ${response.userToken}`);
+                    // myHeaders.append('Authorization', `Bearer ${response.userToken}`);
 
                     if (response.adminPrivilege == true) {
                       nav.classList.remove('dnone');
@@ -784,8 +812,6 @@ function openWindow(method, registerToDelete, buttonClickedId, section) {
   var model = buttonClickedId.split(' ')[0];
   var placeId = buttonClickedId.split(' ')[1];
   locationToDelete.innerText = registerToDelete + '?';
-  console.log(model);
-  console.log(placeId);
 
   if (method == 'update') {
     switch (model) {
@@ -843,8 +869,8 @@ var editContactRegion = document.getElementById('editContactRegion');
 var editContactCountry = document.getElementById('editContactCountry');
 var editContactCity = document.getElementById('editContactCity');
 
-function openEditWindow(item, id) {
-  return regeneratorRuntime.async(function openEditWindow$(_context11) {
+function openEditContactWindow(item, id) {
+  return regeneratorRuntime.async(function openEditContactWindow$(_context11) {
     while (1) {
       switch (_context11.prev = _context11.next) {
         case 0:
@@ -1009,7 +1035,7 @@ function assignRegionToForm(postRegion) {
   });
 }
 
-function assignContactChannelsToForm() {
+function assignContactChannelsToForm(postChannel) {
   var allContactChannels;
   return regeneratorRuntime.async(function assignContactChannelsToForm$(_context16) {
     while (1) {
@@ -1020,16 +1046,15 @@ function assignContactChannelsToForm() {
 
         case 2:
           allContactChannels = _context16.sent;
-          console.log(allContactChannels);
           allContactChannels.forEach(function (contact) {
             var option = document.createElement('option');
             option.innerText = contact.name;
             option.id = contact.id;
             option.value = contact.id;
-            postContactChannel.appendChild(option);
+            postChannel.appendChild(option);
           });
 
-        case 5:
+        case 4:
         case "end":
           return _context16.stop();
       }
@@ -1037,7 +1062,7 @@ function assignContactChannelsToForm() {
   });
 }
 
-function assignContactPreferencesToForm() {
+function assignContactPreferencesToForm(postPreference) {
   var allContactPreferences;
   return regeneratorRuntime.async(function assignContactPreferencesToForm$(_context17) {
     while (1) {
@@ -1048,16 +1073,15 @@ function assignContactPreferencesToForm() {
 
         case 2:
           allContactPreferences = _context17.sent;
-          console.log(allContactPreferences);
           allContactPreferences.forEach(function (contact) {
             var option = document.createElement('option');
             option.innerText = contact.name;
             option.id = contact.id;
             option.value = contact.id;
-            postContactPreference.appendChild(option);
+            postPreference.appendChild(option);
           });
 
-        case 5:
+        case 4:
         case "end":
           return _context17.stop();
       }
@@ -1160,7 +1184,6 @@ function changeCountry(postRegion, postCountry, postCity) {
 
                               case 7:
                                 cityResults = _context19.sent;
-                                console.log(cityResults);
                                 cityResults.forEach(function (city) {
                                   var option = document.createElement('option');
                                   option.innerText = city.cityName;
@@ -1169,7 +1192,7 @@ function changeCountry(postRegion, postCountry, postCity) {
                                   postCity.appendChild(option);
                                 });
 
-                              case 10:
+                              case 9:
                               case "end":
                                 return _context19.stop();
                             }
@@ -1191,5 +1214,80 @@ function changeCountry(postRegion, postCountry, postCity) {
           return _context21.stop();
       }
     }
+  });
+}
+
+var addContactChannelFieldset = document.getElementById('addContactChannelFieldset');
+
+function renderContactChannels() {
+  var allContactChannels;
+  return regeneratorRuntime.async(function renderContactChannels$(_context22) {
+    while (1) {
+      switch (_context22.prev = _context22.next) {
+        case 0:
+          _context22.next = 2;
+          return regeneratorRuntime.awrap(getContactChannels());
+
+        case 2:
+          allContactChannels = _context22.sent;
+          allContactChannels.forEach(function (item) {
+            var div = document.createElement('div');
+            var labelUserAccount = document.createElement('label');
+            var labelPreferences = document.createElement('label');
+            var inputUserAccount = document.createElement('input');
+            var selectPreferences = document.createElement('select');
+            var optionPreferences = document.createElement('option');
+            var p = document.createElement('p');
+            p.innerText = item.name;
+            optionPreferences.innerText = " ";
+            inputUserAccount.name = 'userAccountName';
+            inputUserAccount.id = item.id;
+            selectPreferences.name = item.id;
+            selectPreferences.appendChild(optionPreferences);
+            assignContactPreferencesToForm(selectPreferences);
+            labelPreferences.appendChild(selectPreferences);
+            labelUserAccount.appendChild(p);
+            labelUserAccount.appendChild(inputUserAccount);
+            div.appendChild(labelUserAccount);
+            div.appendChild(labelPreferences);
+            addContactChannelFieldset.appendChild(div);
+          });
+
+        case 4:
+        case "end":
+          return _context22.stop();
+      }
+    }
+  });
+}
+
+var editCompanyWindow = document.getElementById('editCompanyWindow');
+var editCompanyName = document.getElementById('editCompanyName');
+var editCompanyAddress = document.getElementById('editCompanyAddress');
+var editCompanyEmail = document.getElementById('editCompanyEmail');
+var editCompanyTelephone = document.getElementById('editCompanyTelephone');
+var editCompanyRegion = document.getElementById('editCompanyRegion');
+var editCompanyCountry = document.getElementById('editCompanyCountry');
+var editCompanyCity = document.getElementById('editCompanyCity');
+var updateCompany = document.getElementById('updateCompany');
+
+function openEditCompanyWindow(item, id) {
+  console.log(item);
+  editCompanyWindow.classList.remove('dnone');
+  editCompanyWindow.classList.add('fixed-window');
+  assignRegionToForm(editCompanyRegion);
+  changeCountry(editCompanyRegion, editCompanyCountry, editCompanyCity);
+  editCompanyName.value = item.name;
+  editCompanyAddress.value = item.address;
+  editCompanyEmail.value = item.email;
+  editCompanyTelephone.value = item.telephone;
+  updateCompany.addEventListener('click', function () {
+    return updateRegister({
+      name: editCompanyName.value,
+      cityId: editCompanyCity.options[editCompanyCity.selectedIndex].value,
+      address: editCompanyAddress.value,
+      email: editCompanyEmail.value,
+      telephone: editCompanyTelephone.value
+    }, 'companies', id);
   });
 }
