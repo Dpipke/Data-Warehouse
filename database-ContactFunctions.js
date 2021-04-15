@@ -7,39 +7,33 @@ async function getContacts(){
             all: true,
             nested: true,
         }, 
-        // include:{
-        //     model:City,  
-        //     include: {
-        //         all: true, nested: true, required: true
-        //         // model: Country,
-        //         // nested: true,
-        //         // include: {
-        //         //     model: Region,
-        //         //     nested: true,
-        //         // }
-        //     }
-        // },        
-        // include: {
-        //     model: Company,
-        //     nested: true
-        // },
-        // include:{
-        //     model:ContactChannel,
-        //     include: {
-        //         all: true, nested: true
-        //     }
-        // }
+    //     include:{
+    //         model:City,  
+    //         include: {
+    //             // all: true, nested: true
+    //             model: Country,
+    //             nested: true,
+    //             include: {
+    //                 model: Region,
+    //                 nested: true,
+    //             }
+    //         }
+    //     },        
+    //     include: {
+    //         model: Company,
+    //         exclude: {attributes:{exclude: ['CityId'] }}     
+    //     },
+    //     include:{
+    //         model:ContactChannel,
+    //         include: {
+    //             all: true, nested: true
+    //         }
+    //     }
     },
         );
-    // const contacts = JSON.stringify(contactsTable)
-    const allContacts = []
-    const mappedContacts = contactsTable.forEach(item=>{
-        delete item.City
-        console.log(item)
-        allContacts.push(item)
-    })
-    console.log(JSON.stringify(allContacts))
-    return allContacts
+    const contacts = JSON.stringify(contactsTable)
+    console.log(contacts)
+    // return contactsTable
 }
 
 async function getContactChannels(){
