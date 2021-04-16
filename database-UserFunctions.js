@@ -36,6 +36,7 @@ async function getUser(loginRequest){
 
 
 async function updateUserInformation(user){
+  console.log(user)
   const set = Object.keys(user).filter(key => user[key] != null && key != "id").map(key => `${key} : ${user[key]}`).join(",")
   console.log(set)
   const setProperties = set.split(',')

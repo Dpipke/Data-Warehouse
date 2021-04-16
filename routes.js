@@ -116,15 +116,26 @@ app.post('/users',  async (req, res)=>{
 })
 
 app.put('/users/:id', async (req, res) =>{
+    console.log(req.body)
     const user = {
         id: req.params.id,
         name: req.body.name,
         lastname: req.body.lastname,
         email: req.body.email,
-        admin: req.body.perfil
+        admin: req.body.admin
     }
-    const userUpdated = await updateUserInformation(user)
-    console.log(userUpdated)
+    if(req.body.password != ""){
+        const saltRounds = 10;
+            bcrypt.genSalt(saltRounds, async function(err, salt) {
+            bcrypt.hash(req.body.password, salt, async function(err, hash) {
+                if (err) throw res.status(400).send("An error has happened")
+                else{
+                Object.defineProperty(user, 'password', {value: hash})  
+                const userUpdated = await updateUserInformation(user)
+            // res.status(201).send('User successfully activated')
+            }})})  
+    }
+    // console.log(userUpdated)
 })
 app.delete('/users/:id', async (req, res) => {
     const id = req.params.id  

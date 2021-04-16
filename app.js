@@ -394,7 +394,7 @@ function renderTable(results, table, path, model){
     allButtonsDiv.appendChild(buttonsDiv)
     if(model == 'User'){
         deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.fullname , tr.id, deleteUserSection, usersSection, buttonsDiv))
-        editButton.addEventListener('click', () => openEditCompanyWindow(item))
+        editButton.addEventListener('click', () => openEditUserWindow(item, tr.id))
     }if(model == 'Company'){
         deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name , tr.id, deleteUserSection, usersSection, buttonsDiv))
         editButton.addEventListener('click', () => openEditCompanyWindow(item, tr.id, cityId))
@@ -834,4 +834,30 @@ function openEditCompanyWindow(item, id, cityId){
         },
          'companies', id) )
     
+}
+const updateUserWindow = document.getElementById('updateUserWindow')
+const editUserName = document.getElementById('editUserName')
+const editUserLastname = document.getElementById('editUserLastname')
+const editUserEmail = document.getElementById('editUserEmail')
+const editUserRole = document.getElementById('editUserRole')
+const editUserPassword = document.getElementById('editUserPassword')
+const editUserRepeatPassword = document.getElementById('editUserRepeatPassword')
+
+async function openEditUserWindow(item, id){
+    console.log(item)
+    updateUserWindow.classList.remove('dnone')
+    updateUserWindow.classList.add('fixed-window')
+    editUserName.value = item.name
+    editUserLastname.value = item.lastname
+    editUserEmail.value = item.email
+    // editUserRole.value = item.admin
+    if(editUserPassword === editUserRepeatPassword){
+        updateRegister({
+            name:editUserName.value,
+            lastname: editUserLastname.value,
+            email: editUserEmail.value, 
+            admin: editUserRole.options[editUserRole.selectedIndex].value,
+            password: editUserPassword.value,
+        }, 'users', id)
+}
 }
