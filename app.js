@@ -535,7 +535,7 @@ if(sessionStorage.getItem('userToken') != null){
     }else{
         nav.classList.remove('dnone')
         nav.classList.add('ul-nav')
-        usersLi.classList.add('dnone')
+        // usersLi.classList.add('dnone')
     }
 }
 

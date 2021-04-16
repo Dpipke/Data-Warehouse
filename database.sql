@@ -40,3 +40,6 @@ CREATE TABLE preferences( id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, name VARCH
 ALTER TABLE contacts
 ADD COLUMN address VARCHAR(64),
 ADD COLUMN cityId INT(10) NOT NULL 
+
+INSERT INTO `users` (`id`, `name`, `lastname`, `email`, `admin`, `password`) VALUES
+(1, 'Admin', '', 'root', 1, '$2b$10$9j4bY6zqMKcJ9DQnIZzMpusQFXVw1p18m6P.MO37BQBQ51U9UnwQS');
