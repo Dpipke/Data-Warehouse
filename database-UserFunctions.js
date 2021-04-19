@@ -36,23 +36,27 @@ async function getUser(loginRequest){
 
 
 async function updateUserInformation(user){
-  console.log(user)
-  const set = Object.keys(user).filter(key => user[key] != null && key != "id").map(key => `${key} : ${user[key]}`).join(",")
-  console.log(set)
-  const setProperties = set.split(',')
-  const obj = {}
-  setProperties.forEach(function(setProperties){
-    const setValues = setProperties.split(':')
-    obj [setValues[0]] = setValues[1]
-  })
-  const userUpdated = 
-    await User.update({obj}, {
-      where: {
-        id: +user.id
-      }
-    });
-  console.log(userUpdated)
-  return userUpdated
+  console.log(user.password)
+  // const obj = {}
+  // Object.entries(user).filter(([key]) => user[key] != null && key != "id").forEach(function([key, value]){
+  //   obj[key] = value
+  // })
+  const obj = Object.entries(user)
+    .reduce((output, [key, value]) => Object.assign({},
+      output,
+      value != null && key !== 'id' && { [key]: value }
+    ), {})
+
+  obj.password = user.password
+  console.log(obj)
+  // const userUpdated = 
+  //   await User.update(obj, {
+  //     where: {
+  //       id: +user.id
+  //     }
+  //   });
+  // console.log(userUpdated)
+  // return userUpdated
 }
 module.exports = {
     createUser,

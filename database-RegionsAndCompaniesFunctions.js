@@ -60,18 +60,14 @@ async function getAllRegisters(model, id){
 }
 
 async function updateRegister(model, register){
-    const set = Object.keys(register).filter(key => register[key] != null && key != "id").map(key => `${key} : ${JSON.stringify(register[key])}`).join(",")
-    const setProperties = set.split(',')
     const obj = {}
-    setProperties.forEach(function(setProperties){
-        const setValues = setProperties.split(':')
-        obj [setValues[0]] = setValues[1]
-  })
-
+    Object.entries(register).filter(([key]) => register[key] != null && register[key] != "" && register[key] != undefined  && key != "id").forEach(function([key, value]){
+      obj[key] = value
+    })
   // switch(model, set, register) {
     //     case 'Company': 
                 const companyUpdated = 
-                await Company.update({set}, {
+                await Company.update(obj, {
                 where: {
                     id: +register.id
                 }

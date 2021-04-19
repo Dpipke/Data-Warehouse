@@ -140,7 +140,7 @@ const Company = db.define('Company', {
         type: DataTypes.INTEGER,
         allowNull: false,
         foreignKey: true
-    },
+    }, 
     },
     {timestamps: false
 
@@ -188,7 +188,7 @@ const Contact = db.define('Contact', {
     CityId:{
         field:'cityId',
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         foreignKey: true
 
     },
@@ -215,6 +215,7 @@ const ContactChannel = db.define('contact_channels', {
         field: "contactId", 
         type: DataTypes.INTEGER,
         allowNull: false, 
+        foreignKey: true
     },
     contactChannelSocialMediaId: {
         field: "contact_channel_id", 
@@ -294,21 +295,21 @@ Contact.belongsTo(Company)
 Contact.hasMany(ContactChannel, {
     foreignKey: 'id'
   });
-// ContactChannel.belongsTo(Contact);
+ContactChannel.belongsTo(Contact);
 
-ContactChannel.hasOne(ChannelSocialMedia, {
+ContactChannel.hasMany(ChannelSocialMedia, {
     foreignKey: 'id'
   });
 // ChannelSocialMedia.belongsTo(ContactChannel);
 
-ContactChannel.hasOne(Preference, {
+ContactChannel.hasMany(Preference, {
     foreignKey: 'id'
   });
 // Preference.belongsTo(ContactChannel);
 
-Contact.hasOne(City,{
+City.hasMany(Contact,{
     foreignKey: 'id'
 });
-// City.belongsTo(Contact)
+Contact.belongsTo(City)
 
 module.exports = {User, Region, Country, City, Company, Contact, ChannelSocialMedia, Preference, ContactChannel}

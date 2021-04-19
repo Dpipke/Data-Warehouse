@@ -33,7 +33,7 @@ async function getContacts(){
         );
     const contacts = JSON.stringify(contactsTable)
     console.log(contacts)
-    // return contactsTable
+    return contactsTable
 }
 
 async function getContactChannels(){
@@ -74,4 +74,20 @@ async function addContactChannel(data, id){
         const contactChannel = await ContactChannel.create({contactId: id, contactChannelSocialMediaId: +item.ContactChannel, user_account: item.userAccount})
     })
 }
-module.exports = {getContacts, getContactChannels, getContactPreferences, deleteContact, searchContacts, createContact, addContactChannel}
+
+async function updateContact(contact, id){
+    const obj = {}
+    Object.entries(contact).filter(([key]) => contact[key] != null && contact[key] != "" && contact[key] != undefined  && key != "id").forEach(function([key, value]){
+      obj[key] = value
+    })
+    console.log(obj)
+    const contactUpdated = 
+      await Contact.update(obj, {
+        where: {
+          id: id
+        }
+      });
+    console.log(contactUpdated)
+    return contactUpdated
+  }
+module.exports = {getContacts, getContactChannels, getContactPreferences, deleteContact, searchContacts, createContact, addContactChannel, updateContact}

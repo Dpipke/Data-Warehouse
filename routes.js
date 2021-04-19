@@ -24,7 +24,8 @@ const {getContacts,
     deleteContact,
     searchContacts,
     createContact,
-    addContactChannel
+    addContactChannel,
+    updateContact
     }= require('./database-ContactFunctions')
 
 
@@ -116,24 +117,27 @@ app.post('/users',  async (req, res)=>{
 })
 
 app.put('/users/:id', async (req, res) =>{
-    console.log(req.body)
     const user = {
         id: req.params.id,
-        name: req.body.name,
-        lastname: req.body.lastname,
-        email: req.body.email,
-        admin: req.body.admin
+        name: req.body.name.name,
+        lastname: req.body.name.lastname,
+        email: req.body.name.email,
+        admin: req.body.name.admin
     }
-    if(req.body.password != ""){
+    const password = req.body.name.password
+    if(password != ""){
         const saltRounds = 10;
             bcrypt.genSalt(saltRounds, async function(err, salt) {
-            bcrypt.hash(req.body.password, salt, async function(err, hash) {
+            bcrypt.hash(password, salt, async function(err, hash) {
                 if (err) throw res.status(400).send("An error has happened")
                 else{
                 Object.defineProperty(user, 'password', {value: hash})  
                 const userUpdated = await updateUserInformation(user)
-            // res.status(201).send('User successfully activated')
+            res.status(201).send('User successfully activated')
             }})})  
+    }else{
+        const userUpdated = await updateUserInformation(user)
+        res.status(201).send('User successfully activated')
     }
     // console.log(userUpdated)
 })
@@ -225,20 +229,23 @@ app.post('/regions', async (req, res) =>{
     const name = req.body.body.name
     const id = req.body.id
     addNewRegister('Region',name, id); 
+    res.status(201).send()
 } )
 
 app.post('/countries', async (req, res) =>{
     const name = req.body.body.name
     const regionId = req.body.body.id
-    console.log(name, regionId)
     addNewRegister('Country',name, regionId); 
+    res.status(201).send()
+
 } )
 
 app.post('/cities', async (req, res) =>{
     const name = req.body.body.name
     const countryId = req.body.body.id
-    console.log(name, countryId)
     addNewRegister('City',name, countryId); 
+    res.status(201).send()
+
 } )
 app.put('/regions/:id', async (req, res) =>{
     const name = req.body
@@ -262,15 +269,20 @@ app.put('/cities/:id', async (req, res) =>{
 app.delete('/regions/:id', async (req, res)=>{
     const locationId = req.params.id
     deleteRegister('Region', locationId)
+    res.status(200).send()
 })
 
 app.delete('/countries/:id', async (req, res)=>{
     const locationId = req.params.id
     deleteRegister('Country', locationId)
+    res.status(200).send()
+
 })
 app.delete('/cities/:id', async (req, res)=>{
     const locationId = req.params.id
     deleteRegister('City', locationId)
+    res.status(200).send()
+
 })
 
 
@@ -292,44 +304,51 @@ app.post('/companies', async (req, res)=>{
         telephone: req.body.body.telephone
     }
     addNewRegister('Company', newCompany)
+    res.status(201).send()
 })
 app.put('/companies/:id', async (req, res)=>{
     console.log(req.body)
     const companyToUpdate ={
         id: req.params.id,
-        name: req.body.name,
-        cityId: req.body.cityId,
-        address: req.body.address,
-        email: req.body.email,
-        telephone: req.body.telephone
+        name: req.body.name.name,
+        cityId: req.body.name.cityId,
+        address: req.body.name.address,
+        email: req.body.name.email,
+        telephone: req.body.name.telephone
     }
     const updatedCompany =  await updateRegister('Çompany', companyToUpdate)
-    res.status(200).send("updated")
+    res.status(201).send("updated")
 })
 app.delete('/companies/:id', async (req, res)=>{
     const companyId = req.params.id
     deleteRegister('Company', companyId)
+    res.status(200).send()
+
 })
 
 app.get('/contacts', async(req, res)=>{
     const allContacts = await getContacts()
     const contacts = []
     const mappedContacts = allContacts.forEach(item => {
-        console.log(item)
         const eachContact = Object.assign({id: item.id, name: item.name, lastname: item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest})
-        const favoriteChannels = allContacts.map(element => {
-            if(item.id == element.id){
-            const contactChannels = element.contact_channels
-            contactChannels.forEach(channel =>{
-                if(channel.preference.name == 'Favorito'){
-                    eachContact.favoriteChannels.push(channel.contact_social_medium.name)
-                    contacts.push(eachContact)
+        // const favoriteChannels = allContacts.map(element => {
+        //     if(item.id == element.id){
+        //     const contactChannels = element.contact_channels
+        //     contactChannels.forEach(channel =>{
+        //         if(channel.preference.name == 'Favorito'){
+        //             eachContact.favoriteChannels.push(channel.contact_social_medium.name)
+        //             contacts.push(eachContact)
 
-                }
-            })
-            }else{
+        //         }
+        //     }
+        //     )
+            // }else{
                 contacts.push(eachContact)
-            }})})
+            // }
+        // }
+            // )
+        })
+    console.log(contacts.length)
     res.status(200).json(contacts)
 })
 
@@ -343,7 +362,15 @@ app.post('/contacts', async(req, res)=>{
 app.delete('/contacts/:id', async(req, res)=>{
     const contactId = req.params.id
     deleteContact(contactId)
+    res.status(200).send()
 })
+
+app.put('/contacts/:id', async(req, res)=>{
+    const contact = req.body.name
+    const id = req.params.id
+    const updatedContact = await updateContact(contact, id)
+    res.status(201).send()
+ })
 
 app.get('/contacts/search', async(req, res)=>{
     const filters= req.headers.body
@@ -351,19 +378,8 @@ app.get('/contacts/search', async(req, res)=>{
     const contactsObtained = []
     const mappedContacts = contacts.forEach(item => {
         const eachContact = Object.assign({id: item.id, name: item.name, lastname: item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest})
-        const favoriteChannels = contacts.map(element => {
-            if(item.id == element.id){
-            const contactChannels = element.contact_channels
-            contactChannels.forEach(channel =>{
-                if(channel.preference.name == 'Favorito'){
-                    eachContact.favoriteChannels.push(channel.contact_social_medium.name)
-                    contactsObtained.push(eachContact)
-
-                }
-            })
-            }else{
-                contactsObtained.push(eachContact)
-            }})})
+        contactsObtained.push(eachContact)
+        })
     res.status(200).json(contactsObtained)
 })
 

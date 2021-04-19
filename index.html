@@ -24,10 +24,13 @@
         <section class="fixed-window login" id="loginSection">
             <div class="header-section"></div>
             <h1>Bienvenido</h1>
-            <input type="text" placeholder="Usuario" id="userLogin">
-            <input type="text" placeholder="Contraseña" id="passwordLogin">
+            <form action="submit">
+                <input type="text" placeholder="Usuario" id="userLogin">
+                <input type="text" placeholder="Contraseña" id="passwordLogin">
+            </form>
             <p class="dnone" id="incorrectData">Usuario o Contraseña incorrecta</p>
             <p class="locations-buttons" id="loginButton">Ingresar </p>
+            
         </section>
 
         <!-- contacts section -->
@@ -63,7 +66,7 @@
                     <p class='dnone'id="deleteContacts">Eliminar contactos</p>
                 </div>
             </div>
-            <table id="contacts-table">
+            <table id="contacts-table" class="table">
                 <thead>
                     <tr>
                         <th><input type="checkbox"></th>
@@ -71,7 +74,7 @@
                         <th>País/Región</th>
                         <th>Compañía</th>
                         <th>Cargo</th>
-                        <th>Canal Preferido</th>
+                        <!-- <th>Canal Preferido</th> -->
                         <th>Interés</th>
                         <th>Acciones</th>
                     </tr>
@@ -86,23 +89,23 @@
                     <fieldset class="registerFieldset">
                         <label for="name">
                             <p>Nombre</p>
-                            <input type="text" name="name" id="inputContactName">
+                            <input type="text" name="name" id="inputContactName" required>
                         </label>
                         <label for="lastname">
                             <p>Apellido</p>
-                            <input type="text" name="lastname" id="inputContactLastname">
+                            <input type="text" name="lastname" id="inputContactLastname" required>
                         </label>
                         <label for="position">
                             <p>Cargo</p>
-                            <input type="text" name="position" id="inputContactPosition">
+                            <input type="text" name="position" id="inputContactPosition" required>
                         </label>
                         <label for="email">
                             <p>Email</p>
-                            <input type="text" name="email" id="inputContactEmail">
+                            <input type="text" name="email" id="inputContactEmail" required>
                         </label>
                         <label for="company">
                             <p>Compañía</p>
-                            <select name="company" required id="inputContactCompany">
+                            <select name="company" required id="inputContactCompany" required>
                                 <option value="-">Seleccione...</option>
                             </select>   
                         </label>
@@ -132,10 +135,10 @@
                         </label>
                         <label for="interest">
                             <p>Interés</p>
-                            <progress max="100" id="progressInterest"></progress>
+                            <progress max="100" value="0" id="progressInterest"></progress>
                         </label>
                         <label for="percentage">
-                            <select name="percentage" id="inputSelectedInterest">
+                            <select name="percentage" id="inputSelectedInterest" required>
                                 <option value="0">0%</option>
                                 <option value="25">25%</option>
                                 <option value="50">50%</option>
@@ -144,7 +147,7 @@
                             </select>
                         </label>
                     </fieldset>
-                    <fieldset id="addContactChannelFieldset">
+                    <fieldset id="addContactChannelFieldset" class="contactChannelFieldset">
                         </fieldset>
                     </form>
                             <div class="buttons">
@@ -157,8 +160,8 @@
                 <div class="header-section"></div>
                 <p>¿Esta seguro que desea eliminar </p><p id=""></p>
                 <div class="deleteButtons">
-                    <p class="locations-buttons cancelDeleteRegister" id="cancelDeleteUser">Cancelar</p>
-                    <p class="locations-buttons confirmDeleteRegister" id="deleteContactButton">Eliminar</p>    
+                    <p class="locations-buttons cancelAddRegister" id="cancelDeleteUser">Cancelar</p>
+                    <p class="locations-buttons cancelAddRegister" id="deleteContactButton">Eliminar</p>    
                 </div>
             </div>
             <div class="dnone" id="editContactWindow">
@@ -166,7 +169,7 @@
                     <h2>Editar Contacto</h2>
                 </div>
                 <form action="post" class="addContactForm">
-                    <fieldset class="registerFieldset">
+                    <fieldset class="registerFieldset editFieldset">
                         <label for="name">
                             <p>Nombre</p>
                             <input type="text" name="name" id="editContactName">
@@ -183,9 +186,10 @@
                             <p>Email</p>
                             <input type="text" name="email" id="editContactEmail">
                         </label>
-                        <label for="company">
                             <p>Compañía</p>
-                            <input type="text" name="company" id="editContactCompany">
+                            <select name="company" required id="editContactCompany" required>
+                                <option value="">Seleccione...</option>
+                            </select>   
                         </label>
                     </fieldset>
                     <fieldset>
@@ -213,31 +217,25 @@
                         </label>
                         <label for="interest">
                             <p>Interés</p>
-                            <progress max="100"></progress>
+                            <progress max="100" id="editProgressInterest" value=""></progress>
+                        </label>
+                        <label for="percentage">
+                            <select name="percentage" id="inputEditSelectedInterest" required>
+                                <option value="0">0%</option>
+                                <option value="25">25%</option>
+                                <option value="50">50%</option>
+                                <option value="75">75%</option>
+                                <option value="100">100%</option>
+                            </select>
                         </label>
                     </fieldset>
-                    <fieldset>
-                        <label for="contactChannel">
-                            <p>Canal de contacto</p>
-                            <select name="contactChannel" required id="editContactChannel">
-                                <option value="-"></option>
-                            </select>                        
-                        </label>
-                        <label for="userAccount">
-                            <p>Cuenta de Usuario</p>
-                            <input type="text" name="userAccount" id="edittContactAddress">
-                        </label>
-                        <label for="contactPreference">
-                            <p>Preferencias</p>
-                            <select name="contactPreference" required id="editContactPreference">
-                                <option value="-"></option>
-                            </select>                        
-                        </label>
+                    <fieldset id="editContactChannelFieldset"  class="contactChannelFieldset">
+
                     </fieldset>
                 </form>
                 <div class="buttons">
                     <p class="locations-buttons cancelAddRegister" id="cancelAddCompany">Cancelar</p>
-                    <p class="locations-buttons addRegisterButton" id="addContact">Agregar Contacto</p>
+                    <p class="locations-buttons addRegisterButton" id="editContact">Agregar Contacto</p>
                 </div>
             </div>
         </section>
@@ -269,19 +267,25 @@
                     <p href="" class="locations-buttons" id="cancel-update-section">Cancelar</p>
                 </div>
             </div>
+            <div id="appendLocations"></div>
         </section>
         <!-- companies section -->
         <section class="dnone" id="company-section">
             <p class="locations-buttons addRegister" id="addCompanyButton-openWindow">Agregar Compañía</p>
-            <table id='company-table'>
-                <th>Nombre</th>
-                <th>Direccion</th>
-                <th>Email</th>
-                <th>Telefono</th>
-                <th>Ciudad</th>
-                <th>País</th>
-                <th>Región</th>
-                <th>Acciones</th>
+            <table id='company-table' class="table">
+                <thead>
+                    <tr>
+                    <th>Nombre</th>
+                    <th>Direccion</th>
+                    <th>Email</th>
+                    <th>Telefono</th>
+                    <th>Ciudad</th>
+                    <th>País</th>
+                    <th>Región</th>
+                    <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyCompany"></tbody>
             </table>
             <div class="dnone" id="addCompanyWindow">
                 <div class="header-section headerCompany">
@@ -336,8 +340,8 @@
                 <div class="header-section"></div>
                 <p>¿Esta seguro que desea eliminar </p><p id="companyToDelete"></p>
                 <div class="deleteButtons">
-                    <p class="locations-buttons cancelDeleteRegister" id="cancelDeleteUser">Cancelar</p>
-                    <p class="locations-buttons confirmDeleteRegister" id="deleteContactButton">Eliminar</p>    
+                    <p class="locations-buttons addRegisterButton" id="cancelDeleteUser">Cancelar</p>
+                    <p class="locations-buttons cancelAddRegister" id="deleteCompanyButton">Eliminar</p>    
                 </div>
             </div>
             <div class="dnone" id="editCompanyWindow">
@@ -394,13 +398,18 @@
         <!-- users section -->
         <section class="dnone" id="users-section">
             <p class="locations-buttons addRegister" id="addUserButton-openWindow">Agregar Usuario</p>
-            <table id='users-table'>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Email</th>
-                <th>Rol</th>
-                <th>Contraseña</th>
-                <th>Acciones</th>
+            <table id='users-table' class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Contraseña</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyUser"></tbody>
             </table>
             <div class="dnone" id="addUserWindow">
                 <div class="header-section headerCompany">
@@ -452,8 +461,8 @@
                 <div class="header-section"></div>
                 <p>¿Esta seguro que desea eliminar a</p><p id="userToDelete"></p>
                 <div class="deleteButtons">
-                    <p class="locations-buttons cancelDeleteRegister" id="cancelDeleteUser">Cancelar</p>
-                    <p class="locations-buttons confirmDeleteRegister" id="deleteUserButton">Eliminar</p>    
+                    <p class="locations-buttons addRegisterButton" id="cancelDeleteUser">Cancelar</p>
+                    <p class="locations-buttons cancelAddRegister" id="deleteUserButton">Eliminar</p>    
                 </div>
             </div>
             <div class="dnone" id="updateUserWindow">
@@ -493,7 +502,7 @@
                 </form>
                 <div class="buttons">
                     <p class="locations-buttons cancelAddRegister" id="cancelAddUser">Cancelar</p>
-                    <p class="locations-buttons addRegisterButton" id="addUserButton">Editar Usuario</p>
+                    <p class="locations-buttons addRegisterButton" id="updateUser">Editar Usuario</p>
                 </div>
             </div>
         </section>

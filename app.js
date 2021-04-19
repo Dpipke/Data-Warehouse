@@ -13,7 +13,6 @@ const contactsTable = document.getElementById('contacts-table')
 const deleteContactSection = document.getElementById('delete-contact')
 const deleteContactButton = document.getElementById('deleteContactButton')
 
-const TOKEN = sessionStorage.getItem('userToken');
 
 const updateLocationSection = document.getElementById('update-location')
 const deleteLocationSection = document.getElementById('delete-location')
@@ -22,10 +21,10 @@ const addLocation = document.getElementById('add-location')
 const addLocationButton = document.getElementById('add-location-button')
 const newLocation = document.getElementById('input-new-location')
 const addLocationTitle = document.getElementById('addLocation-title')
-usersLi.addEventListener('click', () => openLi('User', usersSection, 'users', usersTable))
-companyLi.addEventListener('click', () => openLi('Company', companySection, 'companies', companyTable))
+usersLi.addEventListener('click', () => openLi('User', usersSection, 'users', tbodyUser))
+companyLi.addEventListener('click', () => openLi('Company', companySection, 'companies', tbodyCompany))
 regionLi.addEventListener('click', () => openLi('Region', regionSection, 'regions'))
-contactsLi.addEventListener('click', () => openLi('Contacts', contactsSection, 'contacts', contactsTable))
+contactsLi.addEventListener('click', () => openLi('Contacts', contactsSection, 'contacts', tbodyContact))
 
 const yesButton=  document.getElementById('yesButton')
 const noButton = document.getElementById('noButton')
@@ -57,7 +56,9 @@ const inputCompanyAddress = document.getElementById('inputCompanyAddress')
 const inputCompanyEmail = document.getElementById('inputCompanyEmail')
 const inputCompanyTelephone = document.getElementById('inputCompanyTelephone')
 const inputSelectedInterest = document.getElementById('inputSelectedInterest')
+const inputEditSelectedInterest = document.getElementById('inputEditSelectedInterest')
 const progressInterest = document.getElementById('progressInterest')
+const editProgressInterest = document.getElementById('editProgressInterest')
 
 const inputContactName = document.getElementById('inputContactName')
 const inputContactLastname = document.getElementById('inputContactLastname')
@@ -66,6 +67,10 @@ const inputContactEmail = document.getElementById('inputContactEmail')
 const inputContactAddress = document.getElementById('inputContactAddress')
 const inputContactCompany = document.getElementById('inputContactCompany')
 const tbodyContact = document.getElementById('tbodyContact')
+
+const tbodyCompany = document.getElementById('tbodyCompany')
+const tbodyUser = document.getElementById('tbodyUser')
+const deleteCompanySection= document.getElementById('deleteCompanySection')
 
 const arrowDownSearch = document.getElementById('arrowDownSearch')
 const searchOptions = document.getElementById('searchOptions')
@@ -81,11 +86,16 @@ inputSelectedInterest.addEventListener('click', ()=>{
     progressInterest.value = interestPercentage
 
 })
+inputEditSelectedInterest.addEventListener('click', ()=>{
+    const interestPercentage = inputEditSelectedInterest.options[inputEditSelectedInterest.selectedIndex].value
+    editProgressInterest.value = interestPercentage
+
+})
 
 arrowDownSearch.addEventListener('click', ()=> {
     searchOptions.classList.toggle('dnone')
     searchOptions.classList.toggle('searchOptions')
-    assignRegionToForm(inputContactLocationToSearch)
+    // assignRegionToForm(inputContactLocationToSearch)
     assignCompaniesToForm(inputContactCompanyToSearch)
 } )
 
@@ -113,7 +123,7 @@ searchLens.addEventListener('click', async ()=>{
 
 addContactButton.addEventListener('click',()=> {
     openAddButton('contacts', null,addContactWindow)
-    renderContactChannels()
+    renderContactChannels(addContactChannelFieldset)
 } )
 addCompanyButton.addEventListener('click', ()=>openAddButton('companies', null,addCompanyWindow ))
 cancelAddCompany.addEventListener('click', ()=> closeWindow(addCompanyWindow, regionSection))
@@ -126,10 +136,9 @@ addCompanyToDBButton.addEventListener('click', ()=>addNewRegister(
         email: inputCompanyEmail.value,
         telephone: inputCompanyTelephone.value
     }, 
-    null,
-    null,
-    null,
-    null))
+    addCompanyWindow,
+    companySection,
+    tbodyCompany))
 
 const addUserButtonOpenWindow = document.getElementById('addUserButton-openWindow')
 const addUserWindow = document.getElementById('addUserWindow')
@@ -149,7 +158,11 @@ const userToDelete = document.getElementById('userToDelete')
 const deleteUserButton = document.getElementById('deleteUserButton')
 const cancelDeleteUser = document.getElementById('cancelDeleteUser')
 addUserButtonOpenWindow.addEventListener('click', ()=> openAddButton('users', null, addUserWindow))
-cancelDeleteUser.addEventListener('click', ()=>closeWindow(deleteUserSection, usersSection))
+cancelDeleteUser.addEventListener('click', ()=> {
+    console.log('anda')
+    closeWindow(deleteUserSection, usersSection)
+    closeWindow(deleteCompanySection, usersSection)
+})
 
 function openLi(model, liSection, path, table){
     if(liSection.classList == 'dnone'){
@@ -173,12 +186,13 @@ async function getRegisters(liSection, path, table, model){
     if(liSection=== regionSection){
         renderRegions(results, liSection)
     }if(liSection === contactsSection){
+        console.log(results)
         renderContacts(results)
     }if(liSection === usersSection || liSection === companySection){
         renderTable(results, table, path, model ) 
     }
 }
-async function addNewRegister(path,  body, window, mainSection, successWindow, closeButton){
+async function addNewRegister(path,  body, window, mainSection, table){
     const url = `http://localhost:3010/${path}`
     const response = await fetch(url,{
         headers: {
@@ -194,17 +208,12 @@ async function addNewRegister(path,  body, window, mainSection, successWindow, c
     if(resultsStatus === 201){
         window.classList.remove('fixed-window')
         window.classList.add('dnone')
-        successWindow.classList.remove('dnone')
-        successWindow.classList.add('fixed-window')
-        successWindow.classList.add('sucessfullyCreated')
-        closeButton.addEventListener('click', () => {
-            closeWindow(window, mainSection)
-        })
+        getRegisters(mainSection, path, table)
     }
    
 }
 
-async function deleteRegister(path, id){
+async function deleteRegister(path, id, window, mainSection, table){
     const url = `http://localhost:3010/${path}/${id}`
     const response = await fetch(url, {
         method: "DELETE",
@@ -212,9 +221,17 @@ async function deleteRegister(path, id){
             Authorization: 'Bearer ' + sessionStorage.getItem('userToken'),
         }
     })
+    const resultsStatus = await response.status
+    if(resultsStatus === 200){
+        window.classList.remove('fixed-window')
+        window.classList.add('dnone')
+        console.log(mainSection, path, table)
+        getRegisters(mainSection, path, table)
+    }
 
 }
-async function updateRegister(updatedInformation, path, id){
+async function updateRegister(updatedInformation, path, id, window, liSection, table, model){
+    console.log(updatedInformation)
     const url = `http://localhost:3010/${path}/${id}`
     const response = await fetch(url,{
         headers: {
@@ -226,14 +243,24 @@ async function updateRegister(updatedInformation, path, id){
         method: "PUT",
         body: JSON.stringify({name: updatedInformation})
     })
+    const result = await response.status
+    console.log(result)
+    if(result == 201){
+        window.classList.remove('fixed-window')
+        mainSection.classList.add('dnone')
+        getRegisters(liSection, path, table, null)
+    }
     
 }
+const appendLocations = document.getElementById('appendLocations')
+
 function renderRegions(results, liSection){
+    appendLocations.innerHTML = ""
     const addRegion = document.createElement('a')
     addRegion.innerText = 'Añadir región'
     addRegion.classList = 'locations-buttons addLocation addRegion'
     addRegion.addEventListener('click',() => openAddButton('Region', null, addLocation))
-    regionSection.appendChild(addRegion)
+    appendLocations.appendChild(addRegion)
     results.forEach(item => {
         const regionDiv = document.createElement('div')
         const p = document.createElement('p')
@@ -248,7 +275,7 @@ function renderRegions(results, liSection){
         addCountry.id = 'buttonDependentOnRegionId '+ item.regionId
         regionDiv.appendChild(addCountry)
         regionDiv.appendChild(p)
-        liSection.appendChild(regionDiv)
+        appendLocations.appendChild(regionDiv)
         const eachRegionsCountries = item.countries
         eachRegionsCountries.forEach(item =>{
             const countryDiv = document.createElement('div')
@@ -264,7 +291,7 @@ function renderRegions(results, liSection){
             addCity.classList = 'locations-buttons addLocation addCity'
             addCity.id = 'buttonDependentOnCountryId '+ item.countryId
             addCity.addEventListener('click',() => openAddButton('Ciudad', countryDiv.id, addLocation))
-            deleteLocationButton.addEventListener('click', () => openWindow('delete',p.innerText, deleteLocationButton.id, deleteLocationSection))
+            deleteLocationButton.addEventListener('click', () =>  openWindow('delete',p.innerText, deleteLocationButton.id, deleteLocationSection))
             editLocationButton.addEventListener('click', () => openWindow('update', p.innerText, editLocationButton.id, updateLocationSection))
             editLocationButton.id = 'Country '+ item.countryId
             deleteLocationButton.id = 'Country '+ item.countryId
@@ -301,7 +328,9 @@ function renderRegions(results, liSection){
     })
 }
 
+
 function renderContacts(results){
+    tbodyContact.innerHTML = ""
     results.forEach(item =>{
         console.log(item)
         const tr = document.createElement('tr')
@@ -334,7 +363,7 @@ function renderContacts(results){
         allButtonsDiv.appendChild(actionsButton)
         allButtonsDiv.appendChild(buttonsDiv)
         editButton.addEventListener('click', () => openEditContactWindow(item, tr.id, item.name, item.lastname))
-        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name+" "+ item.lastname , tr.id, deleteContactSection, contactsSection, buttonsDiv))
+        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name+" "+ item.lastname, tr.id, deleteContactSection, contactsSection, buttonsDiv))
         const registerValues = Object.values(item)
         const tdNameAndEmail = document.createElement('td')
         const tdLocation = document.createElement('td')
@@ -347,7 +376,7 @@ function renderContacts(results){
         tdCompany.innerText = item.company
         tdPosition.innerText = item.position
         tdFavoriteChannel.innerText = item.favoriteChannels
-        tdInterest.innerHTML = `<progress max = 100>${item.interest}</progress>`
+        tdInterest.innerHTML = `<progress max = 100 value="${item.interest}"></progress>`
         tdInterest.value = item.interest
         tr.appendChild(checkbox)
         tr.appendChild(tdNameAndEmail)
@@ -363,6 +392,7 @@ function renderContacts(results){
     
 }
 function renderTable(results, table, path, model){
+    table.innerHTML = ""
     results.forEach(item => {
     const tr = document.createElement('tr')
     const actionsButton = document.createElement('i')
@@ -383,7 +413,6 @@ function renderTable(results, table, path, model){
     tr.id = item.id
     delete item.id
     delete item.cityId
-    console.log(item)
     actionsButton.addEventListener('click', () => {
         buttonsDiv.classList.remove('dnone')
         buttonsDiv.classList.add('buttonsDiv')
@@ -393,10 +422,10 @@ function renderTable(results, table, path, model){
     allButtonsDiv.appendChild(actionsButton)
     allButtonsDiv.appendChild(buttonsDiv)
     if(model == 'User'){
-        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.fullname , tr.id, deleteUserSection, usersSection, buttonsDiv))
+        deleteButton.addEventListener('click', () => {openCompaniesOrUsersWindow(item.name+ " "+ item.lastname , tr.id, deleteUserSection, usersSection, buttonsDiv)})
         editButton.addEventListener('click', () => openEditUserWindow(item, tr.id))
     }if(model == 'Company'){
-        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name , tr.id, deleteUserSection, usersSection, buttonsDiv))
+        deleteButton.addEventListener('click', () =>  openCompaniesOrUsersWindow(item.name , tr.id, deleteCompanySection, companySection, buttonsDiv))
         editButton.addEventListener('click', () => openEditCompanyWindow(item, tr.id, cityId))
     }
     const registerValues = Object.values(item)
@@ -413,9 +442,6 @@ function renderTable(results, table, path, model){
 async function openAddButton(model, modelDependentOnId, window){
     window.classList.remove('dnone')
     window.classList.add('fixed-window')
-    if(window == addCompanyWindow){
-        window.classList.add('addCompanyWindow')
-    }
     addLocationTitle.innerText = `Añadir ${model}`
     if(modelDependentOnId !=null ){
         const id = modelDependentOnId.split(' ')[1]
@@ -429,13 +455,13 @@ async function openAddButton(model, modelDependentOnId, window){
             {
                 name: newLocation.value,
                 id: id
-            }))
+            }, window, regionSection, null))
         }
         if(modelDependentOn == 'Country'){
             addLocationButton.addEventListener('click', ()=> addNewRegister('cities', {
                 name: newLocation.value,
                 id: id
-            }))
+            }, window, regionSection, null))
         }
     }else{
         addLocationButton.addEventListener('click', ()=> addNewRegister('regions', {
@@ -470,29 +496,30 @@ async function openAddButton(model, modelDependentOnId, window){
                 interest: progressInterest.value,
                 contactChannels: contactChannels},
                 addContactWindow,
-                contactsSection)
+                contactsSection, 
+                tbodyContact)
         })
         }
         if(postUserPassword.value==postUserRepeatPassword.value){
-        addUserButton.addEventListener('click', () => {
-            const userBody = {
-                name: postUserName.value,
-                lastname: postUserLastname.value,
-                email: postUserEmail.value,
-                password: postUserPassword.value,
-                role: postUserRole.value
-            }
-            addNewRegister('users', userBody, addUserWindow, usersSection, closeAddUserWindow, closeAddUser)})
-           if(window == addCompanyWindow){
-                assignRegionToForm(postCompanyRegion)
-                changeCountry(postCompanyRegion, postCompanyCountry, postCompanyCity)
-        addCompanyButton.addEventListener('click', () => {})
+            addUserButton.addEventListener('click', () => {
+                const userBody = {
+                    name: postUserName.value,
+                    lastname: postUserLastname.value,
+                    email: postUserEmail.value,
+                    password: postUserPassword.value,
+                    role: postUserRole.value
+                }
+                addNewRegister('users', userBody, addUserWindow, usersSection, tbodyUser)})
+            if(window == addCompanyWindow){
+                    assignRegionToForm(postCompanyRegion)
+                    changeCountry(postCompanyRegion, postCompanyCountry, postCompanyCity)
+            addCompanyButton.addEventListener('click', () => {})
+        }}else{
+            invalidPassword.classList.remove('dnone')
+            invalidPassword.classList.add('warning')
 
-    }else{
-        invalidPassword.classList.remove('dnone')
-        invalidPassword.classList.add('warning')
-
-    }}}
+        }
+}
 }
 const selectedContacts = document.getElementById('selectedContacts')
 const deleteContacts = document.getElementById('deleteContacts')
@@ -567,23 +594,26 @@ async function permiso(response){
     return response
 }
 async function sessionLogin(response){
-    console.log(response)
     sessionStorage.setItem('userToken', response.userToken)
     // const myHeaders = new Headers()
     // myHeaders.append('Authorization', `Bearer ${response.userToken}`);
 
-    if(response.adminPrivilege == true){
-        nav.classList.remove('dnone')
-        nav.classList.add('ul-nav')
-    }else{
-        nav.classList.remove('dnone')
-        nav.classList.add('ul-nav')
-        usersLi.classList.add('dnone')
-    }
+    // if(response.adminPrivilege == true){
+    //     nav.classList.remove('dnone')
+    //     nav.classList.add('ul-nav')
+    // }else{
+    //     nav.classList.remove('dnone')
+    //     nav.classList.add('ul-nav')
+    //     usersLi.classList.add('dnone')
+    // }
 }
 
 })
 function openWindow(method, registerToDelete, buttonClickedId, section){
+    section.classList.remove('dnone')
+    section.classList.add('fixed-window')
+    section.classList.add('login')
+    console.log(section)
     const model = buttonClickedId.split(' ')[0]
     const placeId = buttonClickedId.split(' ')[1]
     locationToDelete.innerText = registerToDelete +'?'
@@ -605,15 +635,15 @@ function openWindow(method, registerToDelete, buttonClickedId, section){
         if(model == 'Region'){
             const path = 'regions'
             yesButton.addEventListener('click', () => {
-                deleteRegister(path, placeId), closeWindow(deleteLocationSection, regionSection, 'regions', 'Region', )})
+                deleteRegister(path, placeId, deleteLocationSection, regionSection, null), closeWindow(deleteLocationSection, regionSection, 'regions', 'Region', )})
         }if(model == 'Country'){
             const path = 'countries'
             yesButton.addEventListener('click', () => {
-                deleteRegister(path, placeId), closeWindow(deleteLocationSection, regionSection, 'regions', 'Region')})
+                deleteRegister(path, placeId, deleteLocationSection, regionSection, null), closeWindow(deleteLocationSection, regionSection, 'regions', 'Region')})
         }if(model == 'City'){
             const path = 'cities'
             yesButton.addEventListener('click', () => {
-                deleteRegister(path, placeId), closeWindow(deleteLocationSection, regionSection, 'regions',  'Region')})
+                deleteRegister(path, placeId, deleteLocationSection, regionSection, null), closeWindow(deleteLocationSection, regionSection, 'regions',  'Region')})
         }}
 
 }
@@ -626,9 +656,13 @@ const editContactCompany = document.getElementById('editContactCompany')
 const editContactRegion = document.getElementById('editContactRegion')
 const editContactCountry = document.getElementById('editContactCountry')
 const editContactCity = document.getElementById('editContactCity')
+const editContactChannel = document.getElementById('editContactChannel')
 
+const editContact = document.getElementById('editContact')
 async function openEditContactWindow(item, id){
+    renderContactChannels(editContactChannelFieldset)
     assignRegionToForm(editContactRegion)
+    assignCompaniesToForm(editContactCompany)
     changeCountry(editContactRegion, editContactCountry, editContactCity)
     editContactWindow.classList.remove('dnone')
     editContactWindow.classList.add('fixed-window')
@@ -637,25 +671,52 @@ async function openEditContactWindow(item, id){
     editContactName.value = item.name
     editContactLastname.value = item.lastname
     editContactCompany.value = item.company
+    inputEditSelectedInterest.value = item.interest
+    editContact.addEventListener('click', ()=>{
+        updateRegister(
+            {name:editContactName.value,
+            lastname: editContactLastname.value,
+            email: editContactEmail.value,
+            position: editContactPosition.value,
+            companyId: editContactCompany.value,
+            cityId: editContactCity.value,
+            interest: inputEditSelectedInterest.value
+         }, 
+         'contacts', 
+         id, 
+         editContactWindow, 
+         contactsSection,
+         tbodyContact, null)
+    })
 }
+
+const companyToDelete = document.getElementById('companyToDelete')
+const deleteCompanyButton = document.getElementById('deleteCompanyButton')
 
 function openCompaniesOrUsersWindow(registerToDelete, buttonClickedId, window, section, buttonsDiv){
     window.classList.remove('dnone')
     window.classList.add('fixed-window')
+    window.classList.add('login')
     buttonsDiv.classList = ""
     buttonsDiv.classList.add('dnone')
     userToDelete.innerText = registerToDelete + " de la base de datos de usuarios?"
+    companyToDelete.innerText = registerToDelete + " de la base de datos de compañías?"
     deleteUserButton.addEventListener('click', () => {
-        deleteRegister('users', buttonClickedId),
+        deleteRegister('users', buttonClickedId, window, section, tbodyUser),
         closeWindow(window, section)
     })
     deleteContactButton.addEventListener('click', ()=>{
-        deleteRegister('contacts', buttonClickedId),
+        deleteRegister('contacts', buttonClickedId, window, section, tbodyContact)
         closeWindow(window, section)
     })
+    deleteCompanyButton.addEventListener('click', ()=>{
+        deleteRegister('companies', buttonClickedId, window, section, tbodyCompany)
+        closeWindow(window, section)
+    } )
 }
 
 function closeWindow(window, mainSection){
+    console.log(window)
     window.className = ""
     window.classList.add('dnone')
     // mainSection.innerHTML = ""
@@ -765,6 +826,7 @@ async function changeCountry(postRegion, postCountry, postCity){
                     }})
                 const cityResults = await cityResponse.json()
                 cityResults.forEach(city =>{
+                    console.log(city)
                     const option = document.createElement('option')
                     option.innerText = city.cityName
                     option.id = city.cityId
@@ -775,8 +837,9 @@ async function changeCountry(postRegion, postCountry, postCity){
 })})}
 
 const addContactChannelFieldset = document.getElementById('addContactChannelFieldset')
+const editContactChannelFieldset = document.getElementById('editContactChannelFieldset')
 
-async function renderContactChannels(){
+async function renderContactChannels(fieldest){
     const allContactChannels = await getContactChannels()
     allContactChannels.forEach(item =>{
         const div = document.createElement('div')
@@ -798,7 +861,7 @@ async function renderContactChannels(){
         labelUserAccount.appendChild(inputUserAccount)
         div.appendChild(labelUserAccount)
         div.appendChild(labelPreferences)
-        addContactChannelFieldset.appendChild(div)
+        fieldest.appendChild(div)
 
     })
 }
@@ -823,16 +886,17 @@ function openEditCompanyWindow(item, id, cityId){
     editCompanyAddress.value = item.address
     editCompanyEmail.value = item.email
     editCompanyTelephone.value = item.telephone
-    // editCompanyCity.options[editCompanyCity.selectedIndex] = cityId
-    updateCompany.addEventListener('click', ()=> updateRegister(
+    updateCompany.addEventListener('click', ()=>{
+        console.log(editCompanyCity.options[editCompanyCity.selectedIndex].value)
+         updateRegister(
         {
             name: editCompanyName.value,
-            cityId:editCompanyCity.options[editCompanyCity.selectedIndex],
+            cityId:editCompanyCity.options[editCompanyCity.selectedIndex].value,
             address: editCompanyAddress.value,
             email: editCompanyEmail.value,
             telephone: editCompanyTelephone.value
         },
-         'companies', id) )
+         'companies', id, editCompanyWindow, companySection, tbodyCompany, null)} )
     
 }
 const updateUserWindow = document.getElementById('updateUserWindow')
@@ -842,22 +906,27 @@ const editUserEmail = document.getElementById('editUserEmail')
 const editUserRole = document.getElementById('editUserRole')
 const editUserPassword = document.getElementById('editUserPassword')
 const editUserRepeatPassword = document.getElementById('editUserRepeatPassword')
+const updateUser = document.getElementById('updateUser')
 
 async function openEditUserWindow(item, id){
-    console.log(item)
     updateUserWindow.classList.remove('dnone')
     updateUserWindow.classList.add('fixed-window')
     editUserName.value = item.name
     editUserLastname.value = item.lastname
     editUserEmail.value = item.email
-    // editUserRole.value = item.admin
-    if(editUserPassword === editUserRepeatPassword){
-        updateRegister({
+    if(item.admin == false){
+        editUserRole.value = 'Basic'
+    }else{
+        editUserRole.value = 'Admin'
+    }
+    if(editUserPassword.value == editUserRepeatPassword.value){
+        updateUser.addEventListener('click', () => 
+            updateRegister({
             name:editUserName.value,
             lastname: editUserLastname.value,
             email: editUserEmail.value, 
             admin: editUserRole.options[editUserRole.selectedIndex].value,
             password: editUserPassword.value,
-        }, 'users', id)
+        }, 'users', id, updateUserWindow, usersSection, tbodyUser, 'User'))
 }
 }
