@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-04-2021 a las 00:30:46
+-- Tiempo de generación: 20-04-2021 a las 18:26:17
 -- Versión del servidor: 10.1.32-MariaDB
 -- Versión de PHP: 7.2.5
 
@@ -39,8 +39,12 @@ CREATE TABLE `cities` (
 --
 
 INSERT INTO `cities` (`id`, `country_id`, `name`) VALUES
-(1, 1, 'Buenos Aires'),
-(2, 2, 'Angola');
+(1, 1, 'Rosario'),
+(2, 3, 'Cali'),
+(4, 4, 'Santiago'),
+(5, 3, 'Medellin'),
+(6, 5, 'Tolna'),
+(7, 5, 'Budapest');
 
 -- --------------------------------------------------------
 
@@ -62,13 +66,8 @@ CREATE TABLE `companies` (
 --
 
 INSERT INTO `companies` (`id`, `name`, `cityId`, `address`, `email`, `telephone`) VALUES
-(1, 'Subirte', 1, NULL, '', 0),
 (2, 'Globant', 1, '123', 'globant@globant', 1231241),
-(3, 'Globant', 1, '123', 'globant@globant', 1231241),
-(4, 'Globant', 1, '123', 'globant@globant', 1231241),
-(5, 'Globant', 1, '123', 'globant@globant', 1231241),
-(6, '', 1, 'calle falsa', '', 0),
-(7, '', 1, 'calle falsa', '', 0);
+(8, 'Mercado Libre', 2, 'nada', 'meli@meli', 1233123);
 
 -- --------------------------------------------------------
 
@@ -94,9 +93,8 @@ CREATE TABLE `contacts` (
 --
 
 INSERT INTO `contacts` (`id`, `name`, `lastname`, `email`, `company_id`, `position`, `contact_channel`, `interest`, `address`, `cityId`) VALUES
-(18, 'Daniela', 'Pipke', 'dfpipke22@ucema.edu.ar', 1, '', NULL, 50, '33 orientales', 1),
-(19, 'Daniela', 'Pipke', 'dfpipke22@ucema.edu.ar', 1, 'Profesora', NULL, 50, '33 orientales', 1),
-(20, '', '', '', 1, '', NULL, 0, '', 1);
+(23, 'Anna', 'Pipke', 'anna@asiko', 8, 'Dev', NULL, 50, '33 orientales', 1),
+(24, 'Daniela', 'Pipke', 'dfpipke22@ucema.edu.ar', 2, 'Dev', NULL, 50, '33 orientales', 2);
 
 -- --------------------------------------------------------
 
@@ -127,7 +125,13 @@ INSERT INTO `contact_channels` (`id`, `contactId`, `contact_channel_id`, `user_a
 (8, 17, 2, 'INSTAGRAM', NULL),
 (9, 18, 1, 'facebook', NULL),
 (10, 19, 1, 'o', NULL),
-(11, 19, 2, 'facebook', NULL);
+(11, 19, 2, 'facebook', NULL),
+(12, 22, 1, 'facebook', NULL),
+(13, 22, 2, 'as', NULL),
+(14, 23, 1, 'facebook', NULL),
+(15, 23, 2, 'as', NULL),
+(16, 24, 1, 'facebook', NULL),
+(17, 24, 2, '@instagram', NULL);
 
 -- --------------------------------------------------------
 
@@ -166,7 +170,9 @@ CREATE TABLE `countries` (
 
 INSERT INTO `countries` (`id`, `region_id`, `name`) VALUES
 (1, 1, 'argentina'),
-(2, 1, 'Colombia');
+(3, 1, 'Colombia'),
+(4, 1, 'Chile'),
+(5, 3, 'Hungría');
 
 -- --------------------------------------------------------
 
@@ -203,7 +209,9 @@ CREATE TABLE `regions` (
 --
 
 INSERT INTO `regions` (`id`, `name`) VALUES
-(1, 'latam');
+(1, 'latam'),
+(2, 'Africa'),
+(3, 'Europa');
 
 -- --------------------------------------------------------
 
@@ -225,10 +233,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `lastname`, `email`, `admin`, `password`) VALUES
-(1, 'Daniela', 'Pipke', 'dfpipke22@ucema.edu.ar', 1, '$2y$12$kJE4dCdmsjLuQwQ7ev8qiOyh1YTTM6VAimqheoE3LKoEiPKNtjPVK '),
-(2, 'Daniela', 'Pipke', 'dani@dani', 0, ''),
-(3, 'Daniela', 'Pipke', 'ruru', 0, '$2b$10$0APJs3yAvstAWyqtA47GNO5OJrQL08k/vO83C0v271Gd2vgmqxvRO'),
-(4, 'Admin', '', 'root', 1, '$2b$10$9j4bY6zqMKcJ9DQnIZzMpusQFXVw1p18m6P.MO37BQBQ51U9UnwQS');
+(4, 'Admin', '', 'root', 1, '$2b$10$9j4bY6zqMKcJ9DQnIZzMpusQFXVw1p18m6P.MO37BQBQ51U9UnwQS'),
+(8, 'Daniela', 'Pipke', 'dfpipke22@ucema.edu.ar', 0, '$2b$10$u4yauL/PqtXqFdjPJB1RneA4vThalFSlYD5RkAat0ZHC7SO3jExvC');
 
 --
 -- Índices para tablas volcadas
@@ -298,25 +304,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `cities`
 --
 ALTER TABLE `cities`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `companies`
 --
 ALTER TABLE `companies`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `contacts`
 --
 ALTER TABLE `contacts`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT de la tabla `contact_channels`
 --
 ALTER TABLE `contact_channels`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `contact_social_media`
@@ -328,7 +334,7 @@ ALTER TABLE `contact_social_media`
 -- AUTO_INCREMENT de la tabla `countries`
 --
 ALTER TABLE `countries`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `preferences`
@@ -340,13 +346,13 @@ ALTER TABLE `preferences`
 -- AUTO_INCREMENT de la tabla `regions`
 --
 ALTER TABLE `regions`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Restricciones para tablas volcadas

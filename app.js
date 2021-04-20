@@ -163,11 +163,18 @@ cancelDeleteUser.addEventListener('click', ()=> {
     closeWindow(deleteUserSection, usersSection)
     closeWindow(deleteCompanySection, usersSection)
 })
+const liSections = [regionSection, contactsSection, usersSection, companySection]
 
 function openLi(model, liSection, path, table){
     if(liSection.classList == 'dnone'){
+        liSections.forEach( item=>{
+            if(item != liSection){
+                console.log(item)
+                item.className = ""
+                item.classList.add('dnone')
+            }})
         liSection.classList.remove('dnone')
-        liSection.classList.add('open-section')
+        liSection.classList.add('open-section')   
     getRegisters(liSection, path, table, model)
     }else{
         liSection.classList.remove('open-section')
@@ -184,6 +191,7 @@ async function getRegisters(liSection, path, table, model){
     })
     const results = await response.json()
     if(liSection=== regionSection){
+        console.log('hola')
         renderRegions(results, liSection)
     }if(liSection === contactsSection){
         console.log(results)
@@ -205,10 +213,16 @@ async function addNewRegister(path,  body, window, mainSection, table){
         body: JSON.stringify({body})
     })
     const resultsStatus = await response.status
+    console.log(resultsStatus)
     if(resultsStatus === 201){
         window.classList.remove('fixed-window')
         window.classList.add('dnone')
-        getRegisters(mainSection, path, table)
+        if(path == 'countries' || path == 'cities'){
+            getRegisters(mainSection, 'regions', table)
+        }else{
+            getRegisters(mainSection, path, table)
+        }
+        
     }
    
 }
@@ -223,13 +237,23 @@ async function deleteRegister(path, id, window, mainSection, table){
     })
     const resultsStatus = await response.status
     if(resultsStatus === 200){
-        window.classList.remove('fixed-window')
-        window.classList.add('dnone')
-        console.log(mainSection, path, table)
-        getRegisters(mainSection, path, table)
+        if(window == 'multipleContacts'){
+            getRegisters(mainSection, path, table)
+            selectedContacts.classList.toggle('dnone')
+        }else{  
+            window.classList.remove('fixed-window')
+            window.classList.add('dnone')
+            console.log(mainSection, path, table)
+            if(path == 'countries' || path == 'cities'){
+                getRegisters(mainSection, 'regions', table)
+            }else{
+                getRegisters(mainSection, path, table)
+        }}
     }
 
 }
+
+
 async function updateRegister(updatedInformation, path, id, window, liSection, table, model){
     console.log(updatedInformation)
     const url = `http://localhost:3010/${path}/${id}`
@@ -247,14 +271,19 @@ async function updateRegister(updatedInformation, path, id, window, liSection, t
     console.log(result)
     if(result == 201){
         window.classList.remove('fixed-window')
-        mainSection.classList.add('dnone')
-        getRegisters(liSection, path, table, null)
+        window.classList.add('dnone')
+        if(path == 'countries' || path == 'cities'){
+            getRegisters(mainSection, 'regions', table)
+        }else{
+            getRegisters(mainSection, path, table)
+        }
     }
     
 }
 const appendLocations = document.getElementById('appendLocations')
 
 function renderRegions(results, liSection){
+    console.log('render')
     appendLocations.innerHTML = ""
     const addRegion = document.createElement('a')
     addRegion.innerText = 'Añadir región'
@@ -352,8 +381,9 @@ function renderContacts(results){
         allButtonsDiv.classList= 'allButtons'
         tr.id = item.id
         delete item.id
+        const selectedContactsArray = []
         checkbox.addEventListener('click', () => {
-            clickedCheckbox(tr)})
+            clickedCheckbox(tr, selectedContactsArray)})
         actionsButton.addEventListener('click', () => {
             buttonsDiv.classList.remove('dnone')
             buttonsDiv.classList.add('buttonsDiv')
@@ -369,13 +399,11 @@ function renderContacts(results){
         const tdLocation = document.createElement('td')
         const tdCompany = document.createElement('td')
         const tdPosition = document.createElement('td')
-        const tdFavoriteChannel = document.createElement('td')
         const tdInterest = document.createElement('td')
         tdNameAndEmail.innerHTML = item.name+" "+ item.lastname + '<br>'+ item.email
         tdLocation.innerText = item.country + " "+item.region
         tdCompany.innerText = item.company
         tdPosition.innerText = item.position
-        tdFavoriteChannel.innerText = item.favoriteChannels
         tdInterest.innerHTML = `<progress max = 100 value="${item.interest}"></progress>`
         tdInterest.value = item.interest
         tr.appendChild(checkbox)
@@ -383,7 +411,6 @@ function renderContacts(results){
         tr.appendChild(tdLocation)
         tr.appendChild(tdCompany)
         tr.appendChild(tdPosition)
-        tr.appendChild(tdFavoriteChannel)
         tr.appendChild(tdInterest)
         tr.appendChild(allButtonsDiv)
         tbodyContact.appendChild(tr)
@@ -466,10 +493,11 @@ async function openAddButton(model, modelDependentOnId, window){
     }else{
         addLocationButton.addEventListener('click', ()=> addNewRegister('regions', {
             name: newLocation.value
-        }))
+        }, window, regionSection, null))
         if(window == addContactWindow){
             assignRegionToForm(postContactRegion)
             changeCountry(postContactRegion, postContactCountry, postContactCity)
+            changeCity(postContactCountry, postContactCity)
             assignCompaniesToForm(inputContactCompany)
             const input = document.getElementsByName('userAccountName')
             const contactChannels = []
@@ -513,6 +541,7 @@ async function openAddButton(model, modelDependentOnId, window){
             if(window == addCompanyWindow){
                     assignRegionToForm(postCompanyRegion)
                     changeCountry(postCompanyRegion, postCompanyCountry, postCompanyCity)
+                    editCompanyCity(postCompanyCountry, postCompanyCity)
             addCompanyButton.addEventListener('click', () => {})
         }}else{
             invalidPassword.classList.remove('dnone')
@@ -523,9 +552,9 @@ async function openAddButton(model, modelDependentOnId, window){
 }
 const selectedContacts = document.getElementById('selectedContacts')
 const deleteContacts = document.getElementById('deleteContacts')
-async function clickedCheckbox(tr){
-    const selectedContactsArray = []
+async function clickedCheckbox(tr,selectedContactsArray){
     tr.classList.toggle('blue')
+
     if(tr.classList == 'blue'){
         selectedContactsArray.push(tr.id)
     }else{
@@ -533,14 +562,14 @@ async function clickedCheckbox(tr){
     }
     if(selectedContactsArray.length == 0){
         selectedContacts.innerText = ""
-        selectedContacts.className = 'dnone'
+        selectedContacts.classList.toggle('dnone')
     }else{
         selectedContacts.innerText = `${selectedContactsArray.length} seleccionados`
         selectedContacts.className ='selectedContacts'
         deleteContacts.className = 'locations-buttons'
         deleteContacts.addEventListener('click', () =>{
             selectedContactsArray.forEach(item =>{
-                deleteRegister('contacts', +item)
+                deleteRegister('contacts', +item, 'multipleContacts', contactsSection, tbodyContact)
             })
         })
     }
@@ -595,17 +624,17 @@ async function permiso(response){
 }
 async function sessionLogin(response){
     sessionStorage.setItem('userToken', response.userToken)
-    // const myHeaders = new Headers()
-    // myHeaders.append('Authorization', `Bearer ${response.userToken}`);
+    const myHeaders = new Headers()
+    myHeaders.append('Authorization', `Bearer ${response.userToken}`);
 
-    // if(response.adminPrivilege == true){
-    //     nav.classList.remove('dnone')
-    //     nav.classList.add('ul-nav')
-    // }else{
-    //     nav.classList.remove('dnone')
-    //     nav.classList.add('ul-nav')
-    //     usersLi.classList.add('dnone')
-    // }
+    if(response.adminPrivilege == true){
+        nav.classList.remove('dnone')
+        nav.classList.add('ul-nav')
+    }else{
+        nav.classList.remove('dnone')
+        nav.classList.add('ul-nav')
+        usersLi.classList.add('dnone')
+    }
 }
 
 })
@@ -621,13 +650,13 @@ function openWindow(method, registerToDelete, buttonClickedId, section){
     if(method == 'update'){
         switch(model){
             case 'Region':
-                updateLocationButton.addEventListener('click', ()=>updateRegister(inputLocationToUpdate.value, 'regions', placeId))
+                updateLocationButton.addEventListener('click', ()=>updateRegister(inputLocationToUpdate.value, 'regions', placeId, updateLocationSection, regionSection))
             break;
             case 'Country':
-                updateLocationButton.addEventListener('click', ()=>updateRegister(inputLocationToUpdate.value, 'countries', placeId))
+                updateLocationButton.addEventListener('click', ()=>updateRegister(inputLocationToUpdate.value, 'countries', placeId, updateLocationSection, regionSection))
             break;
             case 'City':
-                updateLocationButton.addEventListener('click', ()=>updateRegister(inputLocationToUpdate.value, 'cities', placeId))
+                updateLocationButton.addEventListener('click', ()=>updateRegister(inputLocationToUpdate.value, 'cities', placeId, updateLocationSection, regionSection))
             break;
         }
 
@@ -664,6 +693,7 @@ async function openEditContactWindow(item, id){
     assignRegionToForm(editContactRegion)
     assignCompaniesToForm(editContactCompany)
     changeCountry(editContactRegion, editContactCountry, editContactCity)
+    changeCity(editContactCountry, editContactCity)
     editContactWindow.classList.remove('dnone')
     editContactWindow.classList.add('fixed-window')
     editContactPosition.value = item.position
@@ -792,6 +822,7 @@ async function assignCompaniesToForm(selectCompany){
       },
     })
     const results = await response.json()
+    console.log(results)
     results.forEach( company =>{
         const option = document.createElement('option')
         option.innerText = company.name
@@ -810,31 +841,40 @@ async function changeCountry(postRegion, postCountry, postCity){
             Authorization: 'Bearer ' + sessionStorage.getItem('userToken')
             }})
         const results = await response.json()
+        postCountry.innerHTML = ""
+        postCity.innerHTML=  ""
         results.forEach( country =>{
             const option = document.createElement('option')
             option.innerText = country.countryName
             option.id = country.countryId
             option.value = country.countryId
             postCountry.appendChild(option)
-            postCountry.addEventListener('change', async (event)=>{
-                const chosenCountryId = postCountry.options[postCountry.selectedIndex].value
-                const cityUrl = `http://localhost:3010/cities/${chosenCountryId}`
-                const cityResponse = await fetch(cityUrl, {
-                    method: 'GET',
-                    headers: {
-                    Authorization: 'Bearer ' + sessionStorage.getItem('userToken')
-                    }})
-                const cityResults = await cityResponse.json()
-                cityResults.forEach(city =>{
-                    console.log(city)
-                    const option = document.createElement('option')
-                    option.innerText = city.cityName
-                    option.id = city.cityId
-                    option.value = city.cityId
-                    postCity.appendChild(option)
-                })
-            })
-})})}
+        })
+
+})}
+
+async function changeCity(postCountry, postCity){
+    postCountry.addEventListener('change', async (event)=>{
+        const chosenCountryId = postCountry.options[postCountry.selectedIndex].value
+        const cityUrl = `http://localhost:3010/cities/${chosenCountryId}`
+        const cityResponse = await fetch(cityUrl, {
+            method: 'GET',
+            headers: {
+            Authorization: 'Bearer ' + sessionStorage.getItem('userToken')
+            }})
+        const cityResults = await cityResponse.json()
+        postCity.innerHTML = ""
+
+        cityResults.forEach(city =>{
+            console.log(city)
+            const option = document.createElement('option')
+            option.innerText = city.cityName
+            option.id = city.cityId
+            option.value = city.cityId
+            postCity.appendChild(option)
+        })
+    })
+}
 
 const addContactChannelFieldset = document.getElementById('addContactChannelFieldset')
 const editContactChannelFieldset = document.getElementById('editContactChannelFieldset')
@@ -882,6 +922,7 @@ function openEditCompanyWindow(item, id, cityId){
     editCompanyWindow.classList.add('fixed-window')
     assignRegionToForm(editCompanyRegion)
     changeCountry(editCompanyRegion, editCompanyCountry, editCompanyCity)
+    changeCity(editCompanyCountry, editCompanyCity)
     editCompanyName.value = item.name
     editCompanyAddress.value = item.address
     editCompanyEmail.value = item.email

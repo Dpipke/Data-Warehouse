@@ -252,17 +252,21 @@ app.put('/regions/:id', async (req, res) =>{
     const regionId = req.params.id
     console.log(name, countryId)
     updateRegister(); 
+    res.status(201).send()
+
 } )
 app.put('/countries/:id', async (req, res) =>{
     const name = req.body
     const countryId = req.params.id
     console.log(name, countryId)
+    res.status(201).send()
   
 } )
 app.put('/cities/:id', async (req, res) =>{
     const name = req.body
     const cityId = req.params.id
     console.log(name, countryId)
+    res.status(201).send()
 
 } )
 
@@ -290,7 +294,9 @@ app.delete('/cities/:id', async (req, res)=>{
 // companies
 app.get('/companies', async (req, res)=>{
     const allCompanies = await getAllRegisters('Company')
+    console.log(allCompanies)
     const mappedCompanies = allCompanies.map(item=> Object.assign({id: item.id, name: item.name, address: item.address, email: item.email, telephone: item.telephone, cityId:item.CityId, city: item.City.name, country: item.City.Country.name, region: item.City.Country.Region.name }) )
+    console.log(mappedCompanies)
     res.status(200).json(mappedCompanies)
 
 })
@@ -330,7 +336,7 @@ app.get('/contacts', async(req, res)=>{
     const allContacts = await getContacts()
     const contacts = []
     const mappedContacts = allContacts.forEach(item => {
-        const eachContact = Object.assign({id: item.id, name: item.name, lastname: item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest})
+        const eachContact = Object.assign({id: item.id, name: item.name, lastname: item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position,interest: item.interest})
         // const favoriteChannels = allContacts.map(element => {
         //     if(item.id == element.id){
         //     const contactChannels = element.contact_channels
@@ -377,7 +383,7 @@ app.get('/contacts/search', async(req, res)=>{
     const contacts = await searchContacts(filters)
     const contactsObtained = []
     const mappedContacts = contacts.forEach(item => {
-        const eachContact = Object.assign({id: item.id, name: item.name, lastname: item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, favoriteChannels: [],interest: item.interest})
+        const eachContact = Object.assign({id: item.id, name: item.name, lastname: item.lastname, email: item.email, country: item.City.Country.name, region: item.City.Country.Region.name, company: item.Company.name, position:item.position, interest: item.interest})
         contactsObtained.push(eachContact)
         })
     res.status(200).json(contactsObtained)

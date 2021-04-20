@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-        <img src="" alt="LOGO">
+        <p class="logo">LOGO</p>
         <nav>
             <ul class="dnone" id="nav">
                 <li><a id="contacts-li">Contactos</a></li>
@@ -54,8 +54,8 @@
                         <option value="">Seleccione...</option>
                     </select> -->
                     <p>Compañía</p>
-                    <select name="" id="inputContactCompanyToSearch">
-                        <option value="">Seleccione...</option>
+                    <select name="company" id="inputContactCompanyToSearch">
+                        <option name="company" value="">Seleccione...</option>
                     </select>
                 </div>
                 <i class="fas fa-search" id="searchLens"></i>
@@ -63,7 +63,7 @@
                     <!-- <i class="fas fa-download"></i>
                     <i class="fas fa-sort-down">Exportar contactos</i> -->
                     <p class="locations-buttons" id="addContactButton">Agregar contacto</p>
-                    <p class='dnone'id="deleteContacts">Eliminar contactos</p>
+                    <p class='dnone' id="deleteContacts">Eliminar contactos</p>
                 </div>
             </div>
             <table id="contacts-table" class="table">
@@ -74,7 +74,6 @@
                         <th>País/Región</th>
                         <th>Compañía</th>
                         <th>Cargo</th>
-                        <!-- <th>Canal Preferido</th> -->
                         <th>Interés</th>
                         <th>Acciones</th>
                     </tr>
@@ -164,6 +163,7 @@
                     <p class="locations-buttons cancelAddRegister" id="deleteContactButton">Eliminar</p>    
                 </div>
             </div>
+
             <div class="dnone" id="editContactWindow">
                 <div class="header-section headerCompany">
                     <h2>Editar Contacto</h2>

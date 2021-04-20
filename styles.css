@@ -5,6 +5,7 @@ body{
     margin: 0 auto;
     padding: 0;
     max-width: 100vw;
+    font-family: 'Open Sans'
 }
 
 header{
@@ -227,6 +228,8 @@ input{
     display: flex;
     flex-direction: row;
     align-items:  baseline;
+    margin-top: 20%;
+    margin-left: 50%;
 }
 .deleteButtons{
     display: flex;
@@ -281,10 +284,9 @@ input{
 
 .blue{
     background-color: lightblue;
+    border: lightblue solid 2px;
 }
-.chosenContacts{
-    
-}
+
 
 .addContactChannelFieldset{
     display: flex;
@@ -299,7 +301,7 @@ input{
     max-width: 60vw;
     right: 20%;
     position: absolute;
-    top: 30%
+    top: 15%
 }
 .contactOptions{
     display: flex;
@@ -313,8 +315,14 @@ input{
 }
 
 .contactChannelFieldset{
-    /* flex-direction: column; */
+    flex-direction: column;
 }
 .fa-caret-down{
+    margin-top: 1.5%;
+}
+.logo{
+    color: white;
+    font-weight: bolder;
+    margin-left: 5%;
     margin-top: 1.5%;
 }
