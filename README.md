@@ -33,4 +33,4 @@ cd data-warehouse
 >DBPORT = \<database port>  
 
 
-- Run in mysql workbrench the /database.sql before using the app
+- Run in mysql workbrench the /data-warehouse.sql before using the app
